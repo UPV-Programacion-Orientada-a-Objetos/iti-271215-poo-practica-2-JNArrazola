@@ -21,6 +21,7 @@ public class FileManagement {
         Utilities.fillArithmeticOperators();
         Utilities.fillNumericFunctions();
         Utilities.fillValidCharactersInOperation();
+        Utilities.fillAggregateFunctions();
     }
 
     /**

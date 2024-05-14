@@ -21,13 +21,17 @@ import java.util.HashSet;
  */
 public class Parser {
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-
+    public static boolean flag = false;
     /**
      * Function to parse the query, and start dividing it to see what type it is and
      * filter if there's a typo
      */
     public static String parseQuery(String query) throws Exception {
-        FileManagement.initialValidations();
+        if(!flag) {
+            FileManagement.initialValidations();
+            flag = true;
+        }
+        
         String brokeStr[] = query.split(" ");
 
         try {
@@ -471,6 +475,12 @@ public class Parser {
             ArithmeticOperations.manageArithmetic(query);
             return "Operación aritmética realizada con éxito";
         }
+
+        ArrayList<String> aggregateFunctions = Utilities.getVectorOfAggregateFunctions();
+        for(String function : aggregateFunctions)
+            if(query.toUpperCase().contains(function))
+                return AggregationFunctions.manageAggregationFunctions(query);
+
 
         // HashMap que contiene los alias
         HashMap<String, String> alias = new HashMap<>();

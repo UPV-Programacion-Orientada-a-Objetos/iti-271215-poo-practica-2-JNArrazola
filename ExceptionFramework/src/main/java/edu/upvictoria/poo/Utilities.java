@@ -20,6 +20,7 @@ public class Utilities {
     private static final Set<Character> ArithmeticOperators = new HashSet<>();
     private static final ArrayList<String> numericFunctions = new ArrayList<>();
     private static final Set<Character> validCharactersInOperation = new HashSet<>();
+    private static final ArrayList<String> aggregateFunctions = new ArrayList<>();
 
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
@@ -107,6 +108,14 @@ public class Utilities {
         numericFunctions.add("CEIL");
     }
 
+    public static void fillAggregateFunctions(){
+        aggregateFunctions.add("SUM");
+        aggregateFunctions.add("AVG");
+        aggregateFunctions.add("COUNT");
+        aggregateFunctions.add("MAX");
+        aggregateFunctions.add("MIN");
+    }
+
     public static boolean isReservedWord(String word){
         return reservedWords.contains(word.toUpperCase());
     }
@@ -127,6 +136,10 @@ public class Utilities {
         return validCharactersInOperation.contains(character);
     }
     
+    public static boolean isAggregateFunction(String function){
+        return aggregateFunctions.contains(function.toUpperCase());
+    }
+
     public static boolean nameValidations(String name){
         if(name.length() <= 1)
             throw new IllegalArgumentException("Nombre demasiado corto");
@@ -149,6 +162,10 @@ public class Utilities {
             dataTypes.add(s);
         
         return dataTypes;
+    }
+
+    public static ArrayList<String> getVectorOfAggregateFunctions(){
+        return aggregateFunctions;
     }
 
     public static ArrayList<String> getVectorOfNumericFunctions(){

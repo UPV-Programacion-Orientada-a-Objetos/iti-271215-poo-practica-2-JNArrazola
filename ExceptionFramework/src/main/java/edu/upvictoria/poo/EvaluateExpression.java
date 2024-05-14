@@ -110,10 +110,11 @@ public class EvaluateExpression {
                         stack.push(operand1 * operand2);
                         break;
                     case '/':
-                        if (operand2 == 0) throw new RuntimeException("No se puyede dividir entre 0");
+                        if (operand2 == 0) throw new RuntimeException("No se puede dividir entre 0");
                         stack.push(operand1 / operand2);
                         break;
                     case '%':
+                        if (operand2 == 0) throw new RuntimeException("No se puede dividir entre 0");
                         stack.push(operand1 % operand2);
                         break; // Modulo
                     case '#':  

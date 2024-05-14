@@ -32,21 +32,26 @@ public class ArithmeticOperations {
         String function = "";
         
         // Get the function to evaluate
-        for(int i = 0; i < numericFunctions.size(); i++){
-            if(queryWithoutSelect.toUpperCase().contains(numericFunctions.get(i))){
+        for(int i = 0; i < numericFunctions.size(); i++)
+            if(queryWithoutSelect.toUpperCase().contains(numericFunctions.get(i)))
                 if(function.equals(""))
                     function = numericFunctions.get(i);
                 else
                     throw new Exception("No se puede tener más de una función numérica en la sentencia");
-            }   
-        }
 
         String expressionToEvaluate = "";
         if(!function.equals(""))
             // If it doesnt contain () that means they are no arguments so it is invalid
-            if(queryWithoutSelect.contains("(") && queryWithoutSelect.contains(")"))
+            if(queryWithoutSelect.contains("(") && queryWithoutSelect.contains(")")){
+                int index = 0;
+                for (int i = queryWithoutSelect.length() - 1; i >= 0; i--) 
+                    if(queryWithoutSelect.charAt(i) == ')'){
+                        index = i;
+                        break;
+                    }
                 expressionToEvaluate = queryWithoutSelect.substring(
-                    queryWithoutSelect.indexOf("(") + 1, queryWithoutSelect.indexOf(")"));
+                        queryWithoutSelect.indexOf("(") + 1, index);
+            }
             else
                 throw new Exception("Error en la sentencia");
         else 
@@ -55,17 +60,16 @@ public class ArithmeticOperations {
         // See if they are unkwown functions
         if(function.equals(""))
             for(int i = 0; i < expressionToEvaluate.length(); i++)
-                if(!Utilities.isValidInEquation(expressionToEvaluate.charAt(i))){
-                    System.out.println(expressionToEvaluate.charAt(i));
+                if(!Utilities.isValidInEquation(expressionToEvaluate.charAt(i)))
                     throw new Exception("Error en los operadores aritméticos");
-                }
+                
         
         // Evaluate the result
         double result;
         try{
             result = EvaluateExpression.evaluateExpression(expressionToEvaluate);
         } catch (Exception e){
-            throw new Exception("Error en los operadores aritméticos");
+            throw new Exception(e.getMessage());
         }
 
         if(!function.equals("")){
