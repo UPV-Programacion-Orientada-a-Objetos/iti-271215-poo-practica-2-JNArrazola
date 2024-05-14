@@ -14,9 +14,13 @@ import java.util.Set;
 * @author Joshua Arrazola
 * */
 public class Utilities {
-    private static Set<String> reservedWords = new HashSet<String>();
-    private static Set<String> types = new HashSet<String>();
-    private static Set<String> logicOperators = new HashSet<>();
+    private static final Set<String> reservedWords = new HashSet<String>();
+    private static final Set<String> types = new HashSet<String>();
+    private static final Set<String> logicOperators = new HashSet<>();
+    private static final Set<Character> ArithmeticOperators = new HashSet<>();
+    private static final ArrayList<String> numericFunctions = new ArrayList<>();
+    private static final Set<Character> validCharactersInOperation = new HashSet<>();
+
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
     /**
@@ -65,6 +69,44 @@ public class Utilities {
         types.add("DOUBLE");
     }
 
+    public static void fillValidCharactersInOperation(){
+        validCharactersInOperation.add('+');
+        validCharactersInOperation.add('-');
+        validCharactersInOperation.add('*');
+        validCharactersInOperation.add('/');
+        validCharactersInOperation.add('(');
+        validCharactersInOperation.add(')');
+        validCharactersInOperation.add('#');
+        validCharactersInOperation.add('%');
+        validCharactersInOperation.add('0');
+        validCharactersInOperation.add('1');
+        validCharactersInOperation.add('2');
+        validCharactersInOperation.add('3');
+        validCharactersInOperation.add('4');
+        validCharactersInOperation.add('5');
+        validCharactersInOperation.add('6');
+        validCharactersInOperation.add('7');
+        validCharactersInOperation.add('8');
+        validCharactersInOperation.add('9');
+        validCharactersInOperation.add(' ');
+    }
+
+    public static void fillArithmeticOperators(){
+        ArithmeticOperators.add('+');
+        ArithmeticOperators.add('-');
+        ArithmeticOperators.add('*');
+        ArithmeticOperators.add('/');
+        ArithmeticOperators.add('|');
+        ArithmeticOperators.add('%');
+    }
+
+    public static void fillNumericFunctions(){
+        numericFunctions.add("FLOOR");
+        numericFunctions.add("ROUND");
+        numericFunctions.add("RAND");
+        numericFunctions.add("CEIL");
+    }
+
     public static boolean isReservedWord(String word){
         return reservedWords.contains(word.toUpperCase());
     }
@@ -77,6 +119,14 @@ public class Utilities {
         return logicOperators.contains(logic.toUpperCase());
     }
 
+    public static boolean isArithmeticOperator(Character operator){
+        return ArithmeticOperators.contains(operator); 
+    }
+
+    public static boolean isValidInEquation(Character character){
+        return validCharactersInOperation.contains(character);
+    }
+    
     public static boolean nameValidations(String name){
         if(name.length() <= 1)
             throw new IllegalArgumentException("Nombre demasiado corto");
@@ -99,6 +149,10 @@ public class Utilities {
             dataTypes.add(s);
         
         return dataTypes;
+    }
+
+    public static ArrayList<String> getVectorOfNumericFunctions(){
+        return numericFunctions;
     }
 
     public static boolean hasValidChars(String str){

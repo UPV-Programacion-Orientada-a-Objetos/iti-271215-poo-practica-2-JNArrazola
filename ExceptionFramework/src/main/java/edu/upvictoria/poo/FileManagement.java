@@ -18,6 +18,9 @@ public class FileManagement {
         Utilities.fillReservedWords();
         Utilities.fillTypes();
         Utilities.fillLogicOperators();
+        Utilities.fillArithmeticOperators();
+        Utilities.fillNumericFunctions();
+        Utilities.fillValidCharactersInOperation();
     }
 
     /**

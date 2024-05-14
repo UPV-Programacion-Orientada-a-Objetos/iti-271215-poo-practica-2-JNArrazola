@@ -467,6 +467,11 @@ public class Parser {
         if (FileManagement.getDatabasePath() == null)
             throw new FileNotFoundException("No se ha accedido a ninguna base de datos");
 
+        if (!query.toUpperCase().contains("FROM")) {
+            ArithmeticOperations.manageArithmetic(query);
+            return "Operación aritmética realizada con éxito";
+        }
+
         // HashMap que contiene los alias
         HashMap<String, String> alias = new HashMap<>();
 
@@ -520,7 +525,7 @@ public class Parser {
 
         try {
             for (int i = index + 1; i < words.length; i++) {
-                if (Utilities.isReservedWord(words[i])&& !words[i].equalsIgnoreCase("Null"))
+                if (Utilities.isReservedWord(words[i]) && !words[i].equalsIgnoreCase("Null"))
                     continue;
                 condicionales += words[i] + " ";
             }
@@ -755,10 +760,11 @@ public class Parser {
                 for (int j = i + 1; j < words.length; j++) {
                     if (Utilities.isReservedWord(words[j]))
                         continue;
-                    condicionales += words[j];
+                    condicionales += words[j] + " ";
                 }
             }
         }
+        condicionales = condicionales.trim();
 
         ArrayList<String> lines = new ArrayList<>();
         lines.add(header);
@@ -790,12 +796,11 @@ public class Parser {
         }
 
         int indPrimaryKey = 0;
-        for (int i = 0; i < tb.size(); i++) 
-            if(tb.get(i).isPrimaryKey()){
+        for (int i = 0; i < tb.size(); i++)
+            if (tb.get(i).isPrimaryKey()) {
                 indPrimaryKey = i;
                 break;
             }
-        
 
         HashSet<String> ids = new HashSet<>();
         for (int i = 1; i < lines.size(); i++) {

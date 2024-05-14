@@ -3,7 +3,7 @@ package edu.upvictoria.poo;
 import java.io.FileNotFoundException;
 
 /**
- * Actividad 1: Biblioteca de sentencias SQL
+ * Actividad 2: Biblioteca de sentencias SQL
  * Asignatura: Programación Orientada a Objetos
  * Docente: Dr. Said Polanco Martagón
  * ---------------------------------------------
