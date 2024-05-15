@@ -109,8 +109,12 @@ public class Where {
 		String typeValue = type.get(name);
 
 		if (typeValue == null)
-		throw new IllegalArgumentException("Columna en el where no encontrada");
+			throw new IllegalArgumentException("Columna en el where no encontrada");
 		
+		if(typeValue.equals("varchar")||typeValue.equals("date"))
+			Utilities.isValidString(value);
+			
+
 		boolean resultBoolean = false;
 		String[] lineBreak = line.split(",");
 		

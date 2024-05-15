@@ -1,0 +1,6 @@
+numeroreferencia,true,int,-1,true
+fecha_transaccion,false,date,-1,false
+fecha_regreso,true,date,-1,false
+num_socio,false,int,-1,false
+movie_id,false,int,-1,false
+movie_returned,false,int,-1,false

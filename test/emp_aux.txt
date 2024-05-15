@@ -1,0 +1,4 @@
+id,false,int,-1,true
+value,false,float,-1,false
+weight,false,float,-1,false
+height,false,float,-1,false

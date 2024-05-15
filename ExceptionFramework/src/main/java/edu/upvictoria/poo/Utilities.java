@@ -21,6 +21,7 @@ public class Utilities {
     private static final ArrayList<String> numericFunctions = new ArrayList<>();
     private static final Set<Character> validCharactersInOperation = new HashSet<>();
     private static final ArrayList<String> aggregateFunctions = new ArrayList<>();
+    private static final ArrayList<String> validReservedWordsCreateTable = new ArrayList<>();
 
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
@@ -36,6 +37,20 @@ public class Utilities {
             System.out.println("Error leyendo query");
         }
         return query;
+    }
+
+    public static void fillValidReservedWordsCreateTable(){
+        validReservedWordsCreateTable.add("INT");
+        validReservedWordsCreateTable.add("VARCHAR");
+        validReservedWordsCreateTable.add("DATE");
+        validReservedWordsCreateTable.add("NOT");
+        validReservedWordsCreateTable.add("NULL");
+        validReservedWordsCreateTable.add("PRIMARY");
+        validReservedWordsCreateTable.add("KEY");
+        validReservedWordsCreateTable.add("DOUBLE");
+        validReservedWordsCreateTable.add("NOT");
+        validReservedWordsCreateTable.add("NULL");
+        validReservedWordsCreateTable.add("FLOAT");
     }
 
     public static void fillReservedWords(){
@@ -55,6 +70,10 @@ public class Utilities {
         reservedWords.add("BY");
         reservedWords.add("WHERE");
         reservedWords.add("SET");
+        reservedWords.add("COUNT");
+        reservedWords.add("AVG");
+        reservedWords.add("MAX");
+        reservedWords.add("MIN");
     }
 
     public static void fillLogicOperators(){
@@ -114,6 +133,12 @@ public class Utilities {
         aggregateFunctions.add("COUNT");
         aggregateFunctions.add("MAX");
         aggregateFunctions.add("MIN");
+        aggregateFunctions.add("DISTINCT");
+        aggregateFunctions.add("RAND");
+    }
+
+    public static boolean isValidReservedWordCreateTable(String word){
+        return validReservedWordsCreateTable.contains(word.toUpperCase());
     }
 
     public static boolean isReservedWord(String word){
@@ -177,7 +202,7 @@ public class Utilities {
                 str.contains("|")||str.contains("&")||str.contains("=")
                 ||str.contains("<")||str.contains(">")||str.contains("!")
                 ||str.contains(".csv")||str.contains(".txt")||str.contains("_aux")
-                ||str.contains(";")||str.contains(":"));
+                ||str.contains(";")||str.contains(":")||str.contains("(")||str.contains(")"));
     }
 
     public static String readBuffer(){
@@ -189,13 +214,12 @@ public class Utilities {
             String creatingQuery = Utilities.readQuery(bf).trim();
 
             if (creatingQuery.endsWith(";")){
-                query+=creatingQuery;
+                query+=" " + creatingQuery;
                 return query.substring(0, query.indexOf(";"));
-            }
-            else {
-                if (!query.isEmpty()) {
+            } else {
+                if (!query.isEmpty()) 
                     query += " ";
-                }
+                
                 query += creatingQuery;
             }
         }while (true);
@@ -224,6 +248,17 @@ public class Utilities {
             return br.readLine();
         } catch (Exception e) {
             throw new Exception("No se encontró el archivo");
+        }
+    }
+
+    public static boolean isValidString(String str) throws Exception{
+        try {
+            if(str.charAt(0) == '\'' && str.charAt(str.length()-1) == '\'')
+                return true;
+            else 
+                throw new Exception("Faltan comillas simples");
+        } catch (Exception e) {
+            throw new Exception("Faltan comillas simples");   
         }
     }
 }

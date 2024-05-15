@@ -1,0 +1,6 @@
+id,true,int,-1,true
+num,false,int,-1,false
+fecha_pago,false,date,-1,false
+desc,true,varchar,-1,false
+cantidad,true,double,-1,false
+num_referencia,true,int,-1,false

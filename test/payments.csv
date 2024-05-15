@@ -1,0 +1,4 @@
+id,num,fecha_pago,desc,cantidad,num_referencia
+1,1,'23-07-2012','descripcion',2500,11
+2,1,'25-07-2012','pago alquiler',2000,12
+3,3,'30-07-2012','pago alquiler',6000,null

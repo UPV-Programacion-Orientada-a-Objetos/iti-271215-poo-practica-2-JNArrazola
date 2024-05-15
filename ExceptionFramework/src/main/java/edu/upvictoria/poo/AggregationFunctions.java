@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Class to manage aggregation functions from the select query
@@ -45,28 +46,30 @@ public class AggregationFunctions {
         for (int i = 0; i < argumentsBreak.length; i++) 
             argumentsBreak[i] = argumentsBreak[i].trim();
         
-        // for(String arg : argumentsBreak)
-        //     System.out.println(arg);
-
-        // I verify that if the user uses an aggregation function, all the arguments must be aggregation functions too
-        for(String arg : argumentsBreak){
-            String function = "";
-
-            // TODO: Here i will have to manage distinct
-
-            for(String aggregateFunction : aggregateFunctions){
-                if(arg.toUpperCase().contains(aggregateFunction))
-                    if(function.equals(""))
-                        function = aggregateFunction;
-                    else
-                        throw new Exception("No se puede tener más de una función de agregación en la sentencia");
+        HashMap<Integer, String> indexAlias = new HashMap<>();
+        for(int i = 0; i < argumentsBreak.length; i++){
+            if(argumentsBreak[i].contains("AS")){
+                try {
+                    String[] aliasBreak = argumentsBreak[i].split("AS");
+                    indexAlias.put(i, aliasBreak[1].trim());
+                    argumentsBreak[i] = aliasBreak[0].trim();    
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Alias inválido");
+                }
+            } else if(argumentsBreak[i].contains("as")){
+                try {
+                    String[] aliasBreak = argumentsBreak[i].split("as");
+                    indexAlias.put(i, aliasBreak[1].trim());
+                    argumentsBreak[i] = aliasBreak[0].trim();    
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Alias inválido");
+                }
             }
-
-            if(function.equals(""))
-                throw new Exception("Si se usa una función de agregación, todas deben ser funciones de agregación");
         }
 
-        // All this block is to manage where clause
+        // for(String arg : argumentsBreak)
+        //     System.out.println(arg);
+    
         String conditionals = "";
         boolean isUpper = false;
         if(query.contains("WHERE"))
@@ -74,6 +77,8 @@ public class AggregationFunctions {
         else if(query.contains("where"))
             isUpper = false;
 
+        
+        // All this block is to manage where clause
         if(query.toUpperCase().contains("WHERE")){
             String[] queryParts = query.split(isUpper ? "WHERE" : "where");
             System.out.println(queryParts[0]);
@@ -96,6 +101,29 @@ public class AggregationFunctions {
             throw new IOException("No se pudo abrir el archivo");
         }
 
+        // I verify that if the user uses an aggregation function, all the arguments must be aggregation functions too
+        for(String arg : argumentsBreak){
+            String function = "";
+
+            // Here i manage distinct function
+            if((arg.contains("DISTINCT")||arg.contains("distinct"))){
+                if(argumentsBreak.length>1)
+                    throw new Exception("No se pueden seleccionar más de dos columnas si se usa distinct");
+                selectDistinct(resultTable, arg, tableName);
+                return "Operación realizada éxitosamente";
+            }
+
+            for(String aggregateFunction : aggregateFunctions){
+                if(arg.toUpperCase().contains(aggregateFunction))
+                    if(function.equals(""))
+                        function = aggregateFunction;
+                    else
+                        throw new Exception("No se puede tener más de una función de agregación en la sentencia");
+            }
+
+            if(function.equals(""))
+                throw new Exception("Si se usa una función de agregación, todas deben ser funciones de agregación");
+        }
 
         // Here i identify the function, and send the arguments to the function to evaluate
         String output = "";
@@ -111,28 +139,36 @@ public class AggregationFunctions {
             // System.out.println(arg);
 
             switch (function) {
-                case "COUNT":
+                case "COUNT": // Count is the number of elements in the column
                     output += count(resultTable, arg, tableName) + " ";
                     break;
-                case "SUM":
+                case "SUM": // Sum is the sum of all the elements in the column
                     output += sum(resultTable, arg, tableName) + " ";
                     break;
-                case "AVG":
+                case "AVG": // Avg is the average of all the elements in the column
                     output += avg(resultTable, arg, tableName) + " ";
                     break;
-                case "MIN":
+                case "MIN": // Min is the minimum value in the column
                     output += min(resultTable, arg, tableName) + " ";
                     break;
-                case "MAX":
+                case "MAX": // Max is the maximum value in the column
                     output += max(resultTable, arg, tableName) + " ";
                     break;
-                case "COUNT DISTINCT":
-                    System.out.println("COUNT DISTINCT");
+                case "RAND":
+                    output += Math.random() + " ";
                     break;
                 default:
                     break;
             }
         }
+
+
+        for(int i = 0; i < argumentsBreak.length; i++)
+            if(indexAlias.containsKey(i))
+                System.out.print(indexAlias.get(i));
+            else
+                System.out.print(arguments.split(" ")[i]);
+        System.out.println();
         System.out.println(output);
 
         return "";
@@ -158,6 +194,9 @@ public class AggregationFunctions {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
 
+        if(arg.indexOf(")")!=arg.length()-1)
+            throw new Exception("Error en la sentencia COUNT");
+
         if(column.equals("*"))
             return resultTable.size() - 1;
         
@@ -172,7 +211,7 @@ public class AggregationFunctions {
         
         if(index == -1)
             throw new Exception("No se encontró la columna");
-        
+
         for (int i = 1; i < resultTable.size(); i++) {
             String[] row = resultTable.get(i).split(",");
             if(row[index].equals("")||row[index].equals("null"))
@@ -231,6 +270,9 @@ public class AggregationFunctions {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
 
+        if(arg.indexOf(")")!=arg.length()-1)
+            throw new IllegalArgumentException("Error en la sentencia AVG");
+
         if(column.equals("*"))
             throw new IllegalArgumentException("No se puede sacar el promedio de todos los elementos de la tabla");
         
@@ -242,7 +284,7 @@ public class AggregationFunctions {
             }
 
         if(index == -1)
-            throw new IllegalArgumentException("No se encontró la columna");
+            throw new IllegalArgumentException("No se encontró la columna en la función AVG");
 
         try {
             for (int i = 1; i < resultTable.size(); i++) {
@@ -260,7 +302,7 @@ public class AggregationFunctions {
     }
 
     public static String min(ArrayList<String> resultTable, String arg, String tableName) throws Exception{
-        String min = "ZZZZZZZZZZZZZZZZZZZZ";
+        String min = null;
 
         String header = Utilities.getHeaderOfTable(tableName);
         String[] headerBreak = header.split(",");
@@ -269,6 +311,9 @@ public class AggregationFunctions {
             throw new IllegalArgumentException("Faltaron argumentos en la función MIN");
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(arg.indexOf(")")!=arg.length()-1)
+            throw new IllegalArgumentException("Error en la sentencia MIN");
 
         if(column.equals("*"))
             throw new IllegalArgumentException("No se puede sacar el mínimo de todos los elementos de la tabla");
@@ -281,24 +326,24 @@ public class AggregationFunctions {
             }
         
         if(index == -1)
-            throw new IllegalArgumentException("No se encontró la columna");
+            throw new IllegalArgumentException("No se encontró la columna en la función MIN");
         
         for (int i = 1; i < resultTable.size(); i++) {
             String[] row = resultTable.get(i).split(",");
             if(row[index].equals("")||row[index].equals("null"))
                 continue;
-            if(row[index].compareTo(min) < 0)
+            if(min==null||row[index].compareTo(min) < 0)
                 min = row[index];
         }
 
-        if(min.equals("ZZZZZZZZZZZZZZZZZZZZ"))
+        if(min==null)
             throw new IllegalArgumentException("No se encontró un valor mínimo");
 
         return min;
     }
 
     public static String max(ArrayList<String> resultTable, String arg, String tableName) throws Exception{
-        String max = "AAAAAAAAAAAAAAAAAAAA";
+        String max = null;
 
         String header = Utilities.getHeaderOfTable(tableName);
         String[] headerBreak = header.split(",");
@@ -307,6 +352,9 @@ public class AggregationFunctions {
             throw new IllegalArgumentException("Faltaron argumentos en la función MAX");
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(arg.indexOf(")")!=arg.length()-1)
+            throw new IllegalArgumentException("Error en la sentencia MAX");
 
         if(column.equals("*"))
             throw new IllegalArgumentException("No se puede sacar el máximo de todos los elementos de la tabla");
@@ -319,19 +367,64 @@ public class AggregationFunctions {
             }
         
         if(index == -1)
-            throw new IllegalArgumentException("No se encontró la columna");
+            throw new IllegalArgumentException("No se encontró la columna en la función MAX");
         
         for (int i = 1; i < resultTable.size(); i++) {
             String[] row = resultTable.get(i).split(",");
             if(row[index].equals("")||row[index].equals("null"))
                 continue;
-            if(row[index].compareTo(max) > 0)
+            if(max == null||row[index].compareTo(max) > 0)
                 max = row[index];
         }
 
-        if(max.equals("AAAAAAAAAAAAAAAAAAAA"))
+        if(max==null)
             throw new IllegalArgumentException("No se encontró un valor máximo");
 
         return max;
     }
+
+    public static void selectDistinct(ArrayList<String> resultTable, String arg, String tableName) throws Exception {
+        String header = Utilities.getHeaderOfTable(tableName);
+        String[] headerBreak = header.split(",");
+
+        String[] columnBreak = arg.split(" ");
+
+        String column = "";
+        try{
+            column = columnBreak[1];
+        } catch (Exception e){
+            throw new IllegalArgumentException("Faltaron argumentos en la función COUNT DISTINCT");
+        }
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("No se puede contar todos los elementos de la tabla");
+
+        int index = -1;
+        for (int i = 0; i < headerBreak.length; i++) 
+            if(headerBreak[i].equals(column)){
+                index = i;
+                break;
+            }
+        
+        if(index == -1)
+            throw new IllegalArgumentException("No se encontró la columna");
+        
+        System.out.println(arg);
+        for (int i = 1; i < resultTable.size(); i++) {
+            String[] row = resultTable.get(i).split(",");
+            if(row[index].equals("")||row[index].equals("null"))
+                continue;
+            boolean isDistinct = true;
+            for (int j = 1; j < i; j++) {
+                String[] row2 = resultTable.get(j).split(",");
+                if(row[index].equals(row2[index])){
+                    isDistinct = false;
+                    break;
+                }
+            }
+            if(isDistinct)
+                System.out.println(row[index]);
+        }
+    }
+
 }

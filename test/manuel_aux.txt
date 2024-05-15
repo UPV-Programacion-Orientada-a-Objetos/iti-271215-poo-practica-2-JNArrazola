@@ -1,0 +1,2 @@
+id,false,int,-1,true
+manue,false,double,-1,false

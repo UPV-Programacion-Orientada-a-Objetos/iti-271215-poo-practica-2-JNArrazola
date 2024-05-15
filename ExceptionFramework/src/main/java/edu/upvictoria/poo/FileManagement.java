@@ -22,6 +22,7 @@ public class FileManagement {
         Utilities.fillNumericFunctions();
         Utilities.fillValidCharactersInOperation();
         Utilities.fillAggregateFunctions();
+        Utilities.fillValidReservedWordsCreateTable();
     }
 
     /**

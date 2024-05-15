@@ -34,8 +34,11 @@ public class Parser {
         
         String brokeStr[] = query.split(" ");
 
+        if(!parenthesisCheck(query))
+            throw new IllegalArgumentException("Parentesis mal colocados");
+
         try {
-            if (brokeStr.length <= 1 || !parenthesisCheck(query))
+            if (brokeStr.length <= 1)
                 throw new RuntimeException("Query incompleta");
             if (brokeStr[0].equalsIgnoreCase("USE")) {
                 return FileManagement.useDatabase(query, brokeStr);
@@ -149,6 +152,12 @@ public class Parser {
                 boolean canBeNull = true, isPk = false;
 
                 String[] individualArgumentBreak = s.split(" ");
+                for(int i = 0; i < individualArgumentBreak.length; i++)
+                    individualArgumentBreak[i] = individualArgumentBreak[i].trim();
+                
+                for(int i = 1; i < individualArgumentBreak.length; i++)
+                    if(!Utilities.isValidReservedWordCreateTable(individualArgumentBreak[i]))
+                        throw new IllegalArgumentException(individualArgumentBreak[i] + " no es una palabra reservada válida");
 
                 // Check for name
                 String columnName = individualArgumentBreak[0];
@@ -203,6 +212,7 @@ public class Parser {
                         hasPK = true;
                         isPk = true;
                     }
+                
 
                 assignedColumnNames.add(columnName.trim());
                 typesOfTable.add(new TypeBuilder(columnName.trim(), canBeNull,
@@ -450,17 +460,8 @@ public class Parser {
                     throw new Exception("Mayor longitud");
                 return true;
             case "date":
-                if (value.length() != 10)
-                    throw new NumberFormatException("Formato de fecha incorrecto");
-                if (value.charAt(2) != '/' || value.charAt(5) != '/')
-                    throw new NumberFormatException("Formato de fecha incorrecto");
-
-                for (int i = 0; i < value.length(); i++) {
-                    if (i == 2 || i == 5)
-                        continue;
-                    if (!Character.isDigit(value.charAt(i)))
-                        throw new NumberFormatException("Formato de fecha incorrecto");
-                }
+                if(value.charAt(0)!='\'' || value.charAt(value.length()-1)!='\'')
+                    throw new NumberFormatException("Tipo de dato incorrecto");
                 return true;
         }
 
