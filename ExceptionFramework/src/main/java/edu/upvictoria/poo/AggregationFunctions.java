@@ -26,7 +26,6 @@ public class AggregationFunctions {
             } 
             arguments += queryBrk[i] + " ";
         }
-        System.out.println(arguments);
 
         String tableName = "";
         try {
@@ -53,7 +52,7 @@ public class AggregationFunctions {
         for(String arg : argumentsBreak){
             String function = "";
 
-            // TODO: Here i will have to manage distinct and count distinct
+            // TODO: Here i will have to manage distinct
 
             for(String aggregateFunction : aggregateFunctions){
                 if(arg.toUpperCase().contains(aggregateFunction))
@@ -103,6 +102,8 @@ public class AggregationFunctions {
         for(String arg : argumentsBreak){
             String function = determineFunction(arg);
             
+            if((arg.contains("COUNT")&&arg.contains("DISTINCT"))||(arg.contains("count")&&arg.contains("distinct")))
+                function = "COUNT DISTINCT";
             // Contains the function in uppercase letters
             // System.out.println(function);
 
@@ -111,9 +112,23 @@ public class AggregationFunctions {
 
             switch (function) {
                 case "COUNT":
-                    output += count(resultTable, arg, tableName) + "\n";
+                    output += count(resultTable, arg, tableName) + " ";
                     break;
-            
+                case "SUM":
+                    output += sum(resultTable, arg, tableName) + " ";
+                    break;
+                case "AVG":
+                    output += avg(resultTable, arg, tableName) + " ";
+                    break;
+                case "MIN":
+                    output += min(resultTable, arg, tableName) + " ";
+                    break;
+                case "MAX":
+                    output += max(resultTable, arg, tableName) + " ";
+                    break;
+                case "COUNT DISTINCT":
+                    System.out.println("COUNT DISTINCT");
+                    break;
                 default:
                     break;
             }
@@ -165,5 +180,158 @@ public class AggregationFunctions {
             counter++;
         }
         return counter;
+    }
+
+    private static double sum(ArrayList<String> resultTable, String arg, String tableName) throws Exception {
+        double sum = 0;
+        
+        String header = Utilities.getHeaderOfTable(tableName);
+        String[] headerBreak = header.split(",");
+
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new Exception("Faltaron argumentos en la función SUM");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(column.equals("*"))
+            throw new Exception("No se puede sumar todos los elementos de la tabla");
+        
+        int index = -1;
+        for (int i = 0; i < headerBreak.length; i++) 
+            if(headerBreak[i].equals(column)){
+                index = i;
+                break;
+            }
+
+        if(index == -1)
+            throw new Exception("No se encontró la columna");
+
+        try {
+            for (int i = 1; i < resultTable.size(); i++) {
+                String[] row = resultTable.get(i).split(",");
+                if(row[index].equals("")||row[index].equals("null"))
+                    continue;
+                sum += Double.parseDouble(row[index]);
+            }
+        } catch (Exception e) {
+            throw new Exception("No se puede sumar una columna que no sea numérica");
+        }
+        return sum;
+    }
+
+    private static double avg(ArrayList<String> resultTable, String arg, String tableName) throws Exception {
+        double sum = 0;
+        int counter = 0;
+        
+        String header = Utilities.getHeaderOfTable(tableName);
+        String[] headerBreak = header.split(",");
+
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Faltaron argumentos en la función AVG");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("No se puede sacar el promedio de todos los elementos de la tabla");
+        
+        int index = -1;
+        for (int i = 0; i < headerBreak.length; i++) 
+            if(headerBreak[i].equals(column)){
+                index = i;
+                break;
+            }
+
+        if(index == -1)
+            throw new IllegalArgumentException("No se encontró la columna");
+
+        try {
+            for (int i = 1; i < resultTable.size(); i++) {
+                String[] row = resultTable.get(i).split(",");
+                if(row[index].equals("")||row[index].equals("null"))
+                    continue;
+                sum += Double.parseDouble(row[index]);
+                counter++;
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("No se puede sumar una columna que no sea numérica");
+        }
+
+        return (counter != 0) ? (sum/counter) : 0;
+    }
+
+    public static String min(ArrayList<String> resultTable, String arg, String tableName) throws Exception{
+        String min = "ZZZZZZZZZZZZZZZZZZZZ";
+
+        String header = Utilities.getHeaderOfTable(tableName);
+        String[] headerBreak = header.split(",");
+
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Faltaron argumentos en la función MIN");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("No se puede sacar el mínimo de todos los elementos de la tabla");
+        
+        int index = -1;
+        for (int i = 0; i < headerBreak.length; i++) 
+            if(headerBreak[i].equals(column)){
+                index = i;
+                break;
+            }
+        
+        if(index == -1)
+            throw new IllegalArgumentException("No se encontró la columna");
+        
+        for (int i = 1; i < resultTable.size(); i++) {
+            String[] row = resultTable.get(i).split(",");
+            if(row[index].equals("")||row[index].equals("null"))
+                continue;
+            if(row[index].compareTo(min) < 0)
+                min = row[index];
+        }
+
+        if(min.equals("ZZZZZZZZZZZZZZZZZZZZ"))
+            throw new IllegalArgumentException("No se encontró un valor mínimo");
+
+        return min;
+    }
+
+    public static String max(ArrayList<String> resultTable, String arg, String tableName) throws Exception{
+        String max = "AAAAAAAAAAAAAAAAAAAA";
+
+        String header = Utilities.getHeaderOfTable(tableName);
+        String[] headerBreak = header.split(",");
+
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Faltaron argumentos en la función MAX");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.indexOf(")"));
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("No se puede sacar el máximo de todos los elementos de la tabla");
+        
+        int index = -1;
+        for (int i = 0; i < headerBreak.length; i++) 
+            if(headerBreak[i].equals(column)){
+                index = i;
+                break;
+            }
+        
+        if(index == -1)
+            throw new IllegalArgumentException("No se encontró la columna");
+        
+        for (int i = 1; i < resultTable.size(); i++) {
+            String[] row = resultTable.get(i).split(",");
+            if(row[index].equals("")||row[index].equals("null"))
+                continue;
+            if(row[index].compareTo(max) > 0)
+                max = row[index];
+        }
+
+        if(max.equals("AAAAAAAAAAAAAAAAAAAA"))
+            throw new IllegalArgumentException("No se encontró un valor máximo");
+
+        return max;
     }
 }
