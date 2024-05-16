@@ -97,7 +97,7 @@ public class Where {
 		}
 
 		if (operator.equals(""))
-			throw new IllegalArgumentException("Operador no encontrado en la sentencia WHERE");
+			throw new IllegalArgumentException("Operador no encontrado en la sentencia WHERE: " + operation);
 
 		String[] operationBreak = operation.split(",");
 

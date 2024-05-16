@@ -1,0 +1,3 @@
+id,true,int,-1,true
+money,true,float,-1,false
+birthday,false,date,-1,false

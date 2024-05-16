@@ -27,11 +27,12 @@ public class Parser {
      * filter if there's a typo
      */
     public static String parseQuery(String query) throws Exception {
+        query = query.trim();
+
         if(!flag) {
             FileManagement.initialValidations();
             flag = true;
         }
-        
         String brokeStr[] = query.split(" ");
 
         if(!parenthesisCheck(query))
@@ -430,14 +431,14 @@ public class Parser {
                 try {
                     Integer.parseInt(value);
                 } catch (NumberFormatException e) {
-                    throw new NumberFormatException("Tipo de dato incorrecto");
+                    throw new NumberFormatException("Tipo de dato de " + value + " incorrecto");
                 }
                 return true;
             case "float":
                 try {
                     Float.parseFloat(value);
                 } catch (NumberFormatException e) {
-                    throw new NumberFormatException("Tipo de dato incorrecto");
+                    throw new NumberFormatException("Tipo de dato de " + value + " incorrecto");
                 }
                 if (T.getLength() != -1 && value.length() - 1 - value.indexOf(".") > T.getLength())
                     throw new NumberFormatException("Precisión equivocada");
@@ -447,7 +448,7 @@ public class Parser {
                 try {
                     Double.parseDouble(value);
                 } catch (NumberFormatException e) {
-                    throw new NumberFormatException("Tipo de dato incorrecto");
+                    throw new NumberFormatException("Tipo de dato de " + value + " incorrecto");
                 }
                 if (T.getLength() != -1 && value.contains(".")
                         && value.length() - 1 - value.indexOf(".") > T.getLength())
@@ -455,13 +456,13 @@ public class Parser {
                 return true;
             case "varchar":
                 if (value.charAt(0) != '\'' || value.charAt(value.length() - 1) != '\'')
-                    throw new NumberFormatException("Tipo de dato incorrecto");
+                    throw new NumberFormatException("Faltan comillas simples en " + value);
                 if (T.getLength() != -1 && value.length() > T.getLength())
-                    throw new Exception("Mayor longitud");
+                    throw new Exception("Mayor longitud en " + value);
                 return true;
             case "date":
                 if(value.charAt(0)!='\'' || value.charAt(value.length()-1)!='\'')
-                    throw new NumberFormatException("Tipo de dato incorrecto");
+                    throw new NumberFormatException("Faltan comillas simples en "+ value);
                 return true;
         }
 
@@ -560,7 +561,7 @@ public class Parser {
                     }
                 }
                 if (!flag)
-                    throw new IllegalArgumentException("Parámetros desconocidos en el select");
+                    throw new IllegalArgumentException("Parámetros desconocidos en el select: " + hdbrk[i]);
             }
         }
 
@@ -697,7 +698,7 @@ public class Parser {
             throw new IllegalArgumentException("No hay suficientes parámetros");
 
         if (!FileManagement.searchForTable(tableName))
-            throw new FileNotFoundException("No encontré el archivo");
+            throw new FileNotFoundException("No encontré la tabla " + tableName);
 
         String set = "";
         System.out.println(tableName);
