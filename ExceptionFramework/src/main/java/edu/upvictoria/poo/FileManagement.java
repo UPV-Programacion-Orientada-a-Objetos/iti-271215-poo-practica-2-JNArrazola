@@ -23,6 +23,7 @@ public class FileManagement {
         Utilities.fillValidCharactersInOperation();
         Utilities.fillAggregateFunctions();
         Utilities.fillValidReservedWordsCreateTable();
+        Utilities.fillColumnFunctions();
     }
 
     /**
@@ -34,22 +35,27 @@ public class FileManagement {
         
         String path = brkQuery[1];
 
+        if(path.endsWith(".csv"))
+            throw new FileSystemException("La ruta no debe ser un .csv");
+
         if(!path.contains("/"))
             throw new FileNotFoundException("Ruta equivocada");
-        if(!path.endsWith("/")) path+="/";
 
+        if(!path.endsWith("/")) path+="/";
         if(!path.endsWith("/")) databasePath+="/";
 
         File file = new File(path);
-        if (!file.exists()) {
+
+        if (!file.exists()) 
             throw new FileNotFoundException("El directorio no existe");
-        } 
+        
         try {
             File tempFile = File.createTempFile("writeTest", ".tmp", new File(path));
             tempFile.delete();
         } catch (Exception e) {
-            throw new FileSystemException("No tengo permisos");
+            throw new FileSystemException("No tengo permisos para acceder a este directorio");
         }
+
         databasePath = path;
         if(!path.endsWith("/")) databasePath+="/";
         return "Directorio encontrado";

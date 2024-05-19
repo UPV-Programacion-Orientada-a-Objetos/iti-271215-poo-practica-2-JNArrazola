@@ -483,6 +483,10 @@ public class Parser {
             if(query.toUpperCase().contains(function))
                 return AggregationFunctions.manageAggregationFunctions(query);
 
+        ArrayList<String> columnFunctions = Utilities.getVectorOfColumnFunctions();
+        for(String function : columnFunctions)
+            if(query.toUpperCase().contains(function))
+                return ColumnFunctions.manageColumnFunctions(query);
 
         // HashMap que contiene los alias
         HashMap<String, String> alias = new HashMap<>();

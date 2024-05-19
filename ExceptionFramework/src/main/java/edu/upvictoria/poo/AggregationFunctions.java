@@ -46,11 +46,17 @@ public class AggregationFunctions {
         for (int i = 0; i < argumentsBreak.length; i++) 
             argumentsBreak[i] = argumentsBreak[i].trim();
         
+        // Alias management
         HashMap<Integer, String> indexAlias = new HashMap<>();
         for(int i = 0; i < argumentsBreak.length; i++){
             if(argumentsBreak[i].contains("AS")){
                 try {
                     String[] aliasBreak = argumentsBreak[i].split("AS");
+                    aliasBreak[1] = aliasBreak[1].trim();
+
+                    if(!aliasBreak[1].startsWith("'")||!aliasBreak[1].endsWith("'"))
+                        throw new IllegalArgumentException("Alias inválido (faltan comillas simples): " + aliasBreak[1]);
+                    
                     indexAlias.put(i, aliasBreak[1].trim());
                     argumentsBreak[i] = aliasBreak[0].trim();    
                 } catch (Exception e) {
@@ -59,6 +65,11 @@ public class AggregationFunctions {
             } else if(argumentsBreak[i].contains("as")){
                 try {
                     String[] aliasBreak = argumentsBreak[i].split("as");
+                    aliasBreak[1] = aliasBreak[1].trim();
+
+                    if(!aliasBreak[1].startsWith("'")||!aliasBreak[1].endsWith("'"))
+                        throw new IllegalArgumentException("Alias inválido (faltan comillas simples): " + aliasBreak[1]);
+                    
                     indexAlias.put(i, aliasBreak[1].trim());
                     argumentsBreak[i] = aliasBreak[0].trim();    
                 } catch (Exception e) {

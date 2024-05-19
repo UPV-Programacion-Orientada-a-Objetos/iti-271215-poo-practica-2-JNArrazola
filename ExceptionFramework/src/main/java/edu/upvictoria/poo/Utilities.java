@@ -22,6 +22,7 @@ public class Utilities {
     private static final Set<Character> validCharactersInOperation = new HashSet<>();
     private static final ArrayList<String> aggregateFunctions = new ArrayList<>();
     private static final ArrayList<String> validReservedWordsCreateTable = new ArrayList<>();
+    private static final ArrayList<String> colFunctions = new ArrayList<>();
 
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
@@ -137,6 +138,12 @@ public class Utilities {
         aggregateFunctions.add("RAND");
     }
 
+    public static void fillColumnFunctions(){
+        colFunctions.add("UCASE");
+        colFunctions.add("LCASE");
+        colFunctions.add("CAPITALIZE");
+    }
+
     public static boolean isValidReservedWordCreateTable(String word){
         return validReservedWordsCreateTable.contains(word.toUpperCase());
     }
@@ -195,6 +202,10 @@ public class Utilities {
 
     public static ArrayList<String> getVectorOfNumericFunctions(){
         return numericFunctions;
+    }
+
+    public static ArrayList<String> getVectorOfColumnFunctions(){
+        return colFunctions;
     }
 
     public static boolean hasValidChars(String str){
