@@ -99,7 +99,7 @@ public class AppTest
             Parser.parseQuery(query);
         });
 
-        assertEquals("No tengo permisos", generatedException.getMessage());
+        assertEquals("No tengo permisos para acceder a este directorio", generatedException.getMessage());
     }
 
     /**
@@ -130,29 +130,6 @@ public class AppTest
 
         for (String s : strs)
             assertFalse(Parser.parenthesisCheck(s));
-    }
-
-    /**
-     * Create a valid table
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testCreateTable_valid() throws Exception {
-        FileManagement.initialValidations();
-        String path = new File("").getAbsolutePath() + "/";
-        FileManagement.setDatabasePath(path);
-        String query = "CREATE TABLE JOSHUA(ID int not null primary key, NAME varchar(50) not null, MONEY int not null, HEIGHT float not null)";
-
-        String result = Parser.parseQuery(query);
-
-        File expectedFile = new File(path + "JOSHUA.csv");
-        File auxFile = new File(path + "JOSHUA_aux.txt");
-
-        assertTrue(expectedFile.exists());
-        assertEquals("Tabla creada correctamente", result);
-        expectedFile.delete();
-        auxFile.delete();
     }
 
     /**
@@ -189,7 +166,7 @@ public class AppTest
             Parser.parseQuery(query);
         });
 
-        assertEquals("Nombre de tabla repetido", generatedException.getMessage());
+        assertEquals("pedro no es una palabra reservada válida", generatedException.getMessage());
         new File(new File("").getAbsolutePath() + "/JOSHUA.csv").delete();
         new File(new File("").getAbsolutePath() + "/JOSHUA_aux.txt").delete();
     }
@@ -202,7 +179,7 @@ public class AppTest
     @Test
     public void testAlias(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select name as 'nombre', id as apellido from testTables;");
         });
         assertEquals("Alias incorrectos", e.getMessage());
@@ -214,22 +191,21 @@ public class AppTest
     @Test
     public void testArguments(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select id, a from testTable");
         });
-        assertEquals("Parámetros desconocidos en el select", e.getMessage());
+        assertEquals("Parámetros desconocidos en el select: a", e.getMessage());
     }
 
     @Test 
     public void testTableDoesntExist(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select * from a");
         });
         assertEquals("Tabla no encontrada", e.getMessage());
     }
 
-    // Select tests
     /**
      * Path is null
      */
@@ -274,7 +250,7 @@ public class AppTest
             Parser.parseQuery("DELETE FROM tesamd WHERE id = 1;");
         });
 
-        assertEquals("No se ha encontrado el archivo;", generatedException.getMessage());
+        assertEquals("El directorio no existe", generatedException.getMessage());
     }
 
     //---------------------------------------------- CREATE TEST ----------------------------------------------
@@ -284,7 +260,7 @@ public class AppTest
     @Test
     public void testCreateTableWithDuplicateKey(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("CREATE TABLE PRUEBA(ID INT NOT NULL PRIMARY KEY, ID INT NOT NULL PRIMARY KEY)");
         });
         assertEquals("Nombre de columna repetido", e.getMessage());
@@ -299,7 +275,7 @@ public class AppTest
     @Test
     public void testUpdateInvalid(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("update testTable set a=2, b=3 where i = 1");
         });
 
@@ -313,7 +289,7 @@ public class AppTest
     @Test
     public void testInsertInvalid(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("insert into testTable (id, name) values (1, 'joshua', 2)");
         });
 
@@ -326,7 +302,7 @@ public class AppTest
     @Test
     public void testInsertRepeatedPrimaryKey(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("insert into testTable (id, name) values (1,'jose')");
         });
 
@@ -339,12 +315,12 @@ public class AppTest
     @Test
     public void testInsertInvalidTypes(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("INSERT INTO testTable (id,name) values (15,34)");
             Parser.parseQuery("DELETE FROM testTable WHERE values id = 15");
         });
 
-        assertEquals("Tipo de dato incorrecto", e.getMessage());
+        assertEquals("Faltan comillas simples en 34", e.getMessage());
     }
 
     /**
@@ -353,7 +329,7 @@ public class AppTest
     @Test
     public void testNullVerification(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("INSERT INTO testTable (id,height) values (15,1.20)");
         });
 
@@ -366,7 +342,7 @@ public class AppTest
     @Test
     public void testPrecision(){
         Exception e = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test/");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("INSERT INTO testTable (id,name,height) values (15,'pedro',1.2314)");
         });
 

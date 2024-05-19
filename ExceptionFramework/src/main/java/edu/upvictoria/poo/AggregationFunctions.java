@@ -141,8 +141,8 @@ public class AggregationFunctions {
         for(String arg : argumentsBreak){
             String function = determineFunction(arg);
             
-            if((arg.contains("COUNT")&&arg.contains("DISTINCT"))||(arg.contains("count")&&arg.contains("distinct")))
-                function = "COUNT DISTINCT";
+            // if((arg.contains("COUNT")&&arg.contains("DISTINCT"))||(arg.contains("count")&&arg.contains("distinct")))
+            //     function = "COUNT DISTINCT";
             // Contains the function in uppercase letters
             // System.out.println(function);
 
@@ -165,14 +165,10 @@ public class AggregationFunctions {
                 case "MAX": // Max is the maximum value in the column
                     output += max(resultTable, arg, tableName) + " ";
                     break;
-                case "RAND":
-                    output += Math.random() + " ";
-                    break;
                 default:
                     break;
             }
         }
-
 
         for(int i = 0; i < argumentsBreak.length; i++)
             if(indexAlias.containsKey(i))
@@ -437,5 +433,4 @@ public class AggregationFunctions {
                 System.out.println(row[index]);
         }
     }
-
 }

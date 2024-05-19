@@ -23,6 +23,9 @@ public class ColumnFunctions {
             columnsOnSelect += parts[i] + " ";
         }
 
+        if(columnsOnSelect.equals("*"))
+            throw new IllegalArgumentException("No se puede aplicar una función a todas las columnas");
+
         // !Stores the tablename
         String tableName = "";
         if(index + 1 < parts.length)
@@ -119,7 +122,7 @@ public class ColumnFunctions {
         }
         // * End of printing data
 
-        return "Select exitoso";
+        return "Select éxitoso";
     }
 
     public static String UCASE(String s){

@@ -135,7 +135,6 @@ public class Utilities {
         aggregateFunctions.add("MAX");
         aggregateFunctions.add("MIN");
         aggregateFunctions.add("DISTINCT");
-        aggregateFunctions.add("RAND");
     }
 
     public static void fillColumnFunctions(){
@@ -145,7 +144,11 @@ public class Utilities {
     }
 
     public static boolean isValidReservedWordCreateTable(String word){
-        return validReservedWordsCreateTable.contains(word.toUpperCase());
+        for(String s : validReservedWordsCreateTable)
+            if(word.toUpperCase().contains(s))
+                return true;
+
+        return false;
     }
 
     public static boolean isReservedWord(String word){
