@@ -59,3 +59,4 @@ SALIDA ESPERADA: 3500
 ------------------------------ FUNCIONES DE CADENA ------------------------------
 select ucase(name), height from testTable where id <= 3;
 select capitalize(name) from testTable;
+select ucase(name), capitalize(name) as 'mayusculas' from testTable;

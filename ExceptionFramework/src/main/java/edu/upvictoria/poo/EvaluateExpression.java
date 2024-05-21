@@ -147,6 +147,13 @@ public class EvaluateExpression {
      * @param expression
       */
     public static Double evaluateExpression(String expression) {
+        if(expression.charAt(0)=='+'||expression.charAt(0)=='-'){
+            String aux = "0";
+            for (int i = 0; i < expression.length(); i++) 
+                aux+=expression.charAt(i);
+            expression = aux;
+        }
+        
         List<String> postfix = infixToPostfix(expression);
         return evaluatePostfix(postfix);
     }

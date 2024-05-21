@@ -534,7 +534,7 @@ public class Parser {
         if (index + 1 < words.length)
             tableName = words[++index];
         else
-            throw new Exception("Sintaxis incorrecta");
+            throw new Exception("No se encontró el nombre de la tabla");
 
         if (!FileManagement.searchForTable(tableName))
             throw new IOException("Tabla no encontrada");
