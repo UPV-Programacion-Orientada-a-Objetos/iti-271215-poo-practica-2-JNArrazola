@@ -10,11 +10,6 @@ public class ArithmeticOperations {
     private static final Random random = new Random();
 
     public static void manageArithmetic(String query) throws Exception {
-        query = query.replace("DIV", "#");
-        query = query.replace("div", "#");
-        query = query.replace("MOD", "%");
-        query = query.replace("mod", "%");
-        
         String[] queryParts = query.split(" ");
         String queryWithoutSelect = "";
 
