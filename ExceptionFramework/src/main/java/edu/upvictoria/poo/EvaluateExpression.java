@@ -12,7 +12,7 @@ public class EvaluateExpression {
      * @param expression
      * @return
       */
-    private static List<String> infixToPostfix(String expression) {
+    private static List<String> infixToPostfix(String expression) throws Exception {
         List<String> output = new ArrayList<>();
         Stack<Character> operators = new Stack<>();
         StringBuilder numberBuffer = new StringBuilder();
@@ -142,6 +142,10 @@ public class EvaluateExpression {
         }
     }
 
+    private static boolean isNumber(char c) {
+        return Character.isDigit(c) || c == '.';
+    }
+
     /**
      * This method is used to evaluate an arithmetic expression
      * @param expression
@@ -155,6 +159,17 @@ public class EvaluateExpression {
         if(expression.isEmpty())
             throw new RuntimeException("La expresión no puede estar vacía");
         
+        // ? If it does not contain any number, then it is not an expression, it is a string, so I am going to return it
+        boolean flag = false;
+        for (int i = 0; i < expression.length(); i++) {
+            if(isNumber(expression.charAt(i))||isOperator(expression.charAt(i))){
+                flag = true;
+                break;
+            }
+        }
+        if(!flag) return expression;
+
+
         if(expression.charAt(0)=='+'||expression.charAt(0)=='-'){
             String aux = "0";
             for (int i = 0; i < expression.length(); i++) 
@@ -162,8 +177,11 @@ public class EvaluateExpression {
             expression = aux;
         }
         
-        List<String> postfix = infixToPostfix(expression);
-
-        return Double.toString(evaluatePostfix(postfix));
+        try {
+            List<String> postfix = infixToPostfix(expression);
+            return Double.toString(evaluatePostfix(postfix));
+        } catch (Exception e) {
+            return "null";
+        }
     }
 }

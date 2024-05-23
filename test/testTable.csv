@@ -1,7 +1,6 @@
 id,name,money,height
 1,'pedro',1000,1.60
 2,'manuel',2500,1.90
-3,'said',null,1.70
-4,'manuel',2500,1.70
-5,'manuel',1500,1.70
-6,'jose',3500,1.85
+3,'manuel',2500,1.70
+4,'manuel',1500,1.70
+5,'jose',null,1.85

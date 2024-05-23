@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 /**
  * Fundamental class to do the evaluation
+ * This class is crazy, i dont even know how i figured this out and made it work without using a tree lol
+ * 
+ * @author Joshua Arrazola
   */
 public class Eval {
     
@@ -37,32 +40,58 @@ public class Eval {
 
         for (int i = 0; i < workedArgBrk.length; i++) {
             // ? ROUND
-
             if(workedArgBrk[i].toUpperCase().startsWith("ROUND")){
                 String round = workedArgBrk[i];
 
-                for (int j = i + 1; j < workedArgBrk.length; j++) {
-                    if(!hasValidParenthesis(round)){
-                        round+=workedArgBrk[j];
+                if(hasValidParenthesis(round)){
+                    expressionToEvaluate+=ROUND(round, headers, lineBreak);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(round)){
+                            round+=workedArgBrk[j];
 
-                        if(hasValidParenthesis(round)){
-                            expressionToEvaluate+=ROUND(round, headers, lineBreak);
-                            i = j;
-                            break;
+                            if(hasValidParenthesis(round)){
+                                expressionToEvaluate+=ROUND(round, headers, lineBreak);
+                                i = j;
+                                break;
+                            }
                         }
                     }
                 }
             } else if(workedArgBrk[i].toUpperCase().startsWith("FLOOR")){
                 String floor = workedArgBrk[i];
 
-                for (int j = i + 1; j < workedArgBrk.length; j++) {
-                    if(!hasValidParenthesis(floor)){
-                        floor+=workedArgBrk[j];
+                // ! Si de una es válido entonces a evaluar, si no entonces a seguir con la recursiva
+                if(hasValidParenthesis(floor)){
+                    expressionToEvaluate+=FLOOR(floor, headers, lineBreak);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(floor)){
+                            floor+=workedArgBrk[j];
+    
+                            if(hasValidParenthesis(floor)){
+                                expressionToEvaluate+=FLOOR(floor, headers, lineBreak);
+                                i = j;
+                                break;
+                            }
+                        } 
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("CEIL")){
+                String ceil = workedArgBrk[i];
 
-                        if(hasValidParenthesis(floor)){
-                            expressionToEvaluate+=FLOOR(floor, headers, lineBreak);
-                            i = j;
-                            break;
+                if(hasValidParenthesis(ceil)){
+                    expressionToEvaluate+=CEIL(ceil, headers, lineBreak);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(ceil)){
+                            ceil+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(ceil)){
+                                expressionToEvaluate+=CEIL(ceil, headers, lineBreak);
+                                i = j;
+                                break;
+                            }
                         }
                     }
                 }
@@ -105,6 +134,12 @@ public class Eval {
         
         numberToEvaluate = eval(numberToEvaluate, headers, lineBreak);
 
+        try {
+            Double.parseDouble(numberToEvaluate);
+        } catch (Exception e) {
+            return "null";
+        }
+
         return Double.toString(Math.round(Double.parseDouble(numberToEvaluate)));
     }
 
@@ -119,4 +154,32 @@ public class Eval {
         return Double.toString(Math.floor(Double.parseDouble(numberToEvaluate)));
     }
 
+    public static String CEIL(String arg, ArrayList<Header> headers, String[] lineBreak){
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia CEIL");
+
+        String numberToEvaluate = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak);
+        
+        try {
+            Double.parseDouble(numberToEvaluate);
+        } catch (Exception e) {
+            return "null";
+        }
+
+        return Double.toString(Math.ceil(Double.parseDouble(numberToEvaluate)));
+    }
+
+    // -----------------  STRING FUNCTIONS  -----------------
+
+    public static String UCASE(String arg, ArrayList<Header> headers, String[] lineBreak){
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia UCASE");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        
+        return "";
+    }
 }
