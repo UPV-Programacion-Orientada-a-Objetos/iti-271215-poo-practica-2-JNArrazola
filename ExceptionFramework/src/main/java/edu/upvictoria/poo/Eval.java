@@ -95,7 +95,43 @@ public class Eval {
                         }
                     }
                 }
-            } else 
+            } else if(workedArgBrk[i].toUpperCase().startsWith("UCASE")){
+                String ucase = workedArgBrk[i];
+
+                if(hasValidParenthesis(ucase)){
+                    expressionToEvaluate+=UCASE(ucase, headers, lineBreak);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(ucase)){
+                            ucase+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(ucase)){
+                                expressionToEvaluate+=UCASE(ucase, headers, lineBreak);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("LCASE")){
+                String lcase = workedArgBrk[i];
+
+                if(hasValidParenthesis(lcase)){
+                    expressionToEvaluate+=LCASE(lcase, headers, lineBreak);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(lcase)){
+                            lcase+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(lcase)){
+                                expressionToEvaluate+=LCASE(lcase, headers, lineBreak);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else
                 expressionToEvaluate+=workedArgBrk[i];
         }
 
@@ -179,7 +215,23 @@ public class Eval {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                return lineBreak[headers.get(i).getIndex()].toUpperCase();
+
+        throw new IllegalArgumentException("No se encontró la columna " + column);
+    }
+
+    public static String LCASE(String arg, ArrayList<Header> headers, String[] lineBreak){
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia LCASE");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
-        return "";
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                return lineBreak[headers.get(i).getIndex()].toLowerCase();
+
+        throw new IllegalArgumentException("No se encontró la columna " + column);
     }
 }
