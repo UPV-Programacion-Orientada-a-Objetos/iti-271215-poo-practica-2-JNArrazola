@@ -25,6 +25,11 @@ public class App {
     public void run(){
         boolean runFlag = true;
 
+        try {
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test");
+        } catch (Exception e) {
+        }
+        
         // Here the user is gonna insert the queries
         do {
             try{

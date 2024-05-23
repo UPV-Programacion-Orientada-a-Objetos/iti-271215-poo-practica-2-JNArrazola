@@ -62,7 +62,7 @@ public class ArithmeticOperations {
                     throw new Exception("Error en los operadores aritméticos");
         
         // Evaluate the result
-        double result;
+        String result;
         if(!function.equalsIgnoreCase("RAND"))
             try{
                 result = EvaluateExpression.evaluateExpression(expressionToEvaluate);
@@ -70,26 +70,26 @@ public class ArithmeticOperations {
                 throw new Exception(e.getMessage());
             }
         else 
-            result = 0;
+            result = "0";
 
 
         if(!function.equals("")){
             switch(function){
                 case "FLOOR":
                 case "floor":
-                    result = Math.floor(result);
+                    result = Double.toString(Math.floor(Double.parseDouble(result)));
                     break;
                 case "ROUND":
                 case "round":
-                    result = Math.round(result);
+                    result = Double.toString(Math.round(Double.parseDouble(result)));
                     break;
                 case "CEIL":
                 case "ceil":
-                    result = Math.ceil(result);
+                    result = Double.toString(Math.ceil(Double.parseDouble(result)));
                     break;
                 case "RAND":
                 case "rand":
-                    result = RAND(expressionToEvaluate);
+                    result = Double.toString(RAND(expressionToEvaluate));
                     break;
             }
         }

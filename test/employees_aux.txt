@@ -1,2 +1,0 @@
-id,true,int,-1,true
-money,false,float,-1,false

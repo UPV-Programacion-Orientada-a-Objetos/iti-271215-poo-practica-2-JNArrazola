@@ -146,7 +146,15 @@ public class EvaluateExpression {
      * This method is used to evaluate an arithmetic expression
      * @param expression
       */
-    public static Double evaluateExpression(String expression) {
+    public static String evaluateExpression(String expression) {
+        // ? If it contains NULL in somewhere, im just going to return null
+        if(expression.toUpperCase().contains("NULL"))
+            return "null";
+        
+        // ? If it is empty thats an error
+        if(expression.isEmpty())
+            throw new RuntimeException("La expresión no puede estar vacía");
+        
         if(expression.charAt(0)=='+'||expression.charAt(0)=='-'){
             String aux = "0";
             for (int i = 0; i < expression.length(); i++) 
@@ -155,6 +163,7 @@ public class EvaluateExpression {
         }
         
         List<String> postfix = infixToPostfix(expression);
-        return evaluatePostfix(postfix);
+
+        return Double.toString(evaluatePostfix(postfix));
     }
 }

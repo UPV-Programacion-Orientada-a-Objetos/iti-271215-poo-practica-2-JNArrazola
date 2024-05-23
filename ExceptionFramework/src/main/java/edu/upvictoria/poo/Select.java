@@ -14,7 +14,6 @@ import java.util.ArrayList;
  * values of the columns, and then, i will start doing recursively the functions 
  * - 
  */
-
 public class Select {
     public static String select(String query) throws Exception {
         query = query.replace("DIV", "#");
@@ -104,21 +103,19 @@ public class Select {
         }
 
         // ! First i iterate through the result table
-        for (int i = 0; i < resultTable.size(); i++) {
+        for (int i = 1; i < resultTable.size(); i++) {
             String[] lineBrk = resultTable.get(i).split(",");
 
             // ! Then i iterate through the args
             for (int j = 0; j < argsBreak.length; j++) {
                 String arg = argsBreak[j];
                 
+                // Eval.eval(arg, headers, lineBrk);
 
-
-                /* // ! Then i replace the header
-                for (int k = 0; k < headers.size(); k++) 
-                    arg = arg.replace(headers.get(k).getName(), lineBrk[headers.get(k).getIndex()]); */
-                
+                System.out.print(Eval.eval(arg, headers, lineBrk) + " ");
                 // System.out.println(arg);
             }
+            System.out.println();
         }
 
         return "Select realizado con éxito";
