@@ -275,4 +275,15 @@ public class Utilities {
             throw new Exception("Faltan comillas simples");   
         }
     }
+
+    public static String getType(String column, String tableName){
+        ArrayList<TypeBuilder> types = FileManagement.decompressInfo(tableName);
+
+        for(TypeBuilder type : types)
+            if(type.getName().equals(column))
+                return type.getDataType();
+
+        return "NF";
+    }
+
 }

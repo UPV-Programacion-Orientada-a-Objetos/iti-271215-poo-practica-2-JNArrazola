@@ -1,6 +1,7 @@
 package edu.upvictoria.poo;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Fundamental class to do the evaluation
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  * @author Joshua Arrazola
   */
 public class Eval {
-    
+    private static final Random random = new Random();
     // query = query.replace("DIV", "#");
     // query = query.replace("div", "#");
     // query = query.replace("MOD", "%");
@@ -19,7 +20,7 @@ public class Eval {
      * Function to evaluate the query
      * @param query
      */
-    public static String eval(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String eval(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         String workedArg = "";
 
         arg = arg.trim();
@@ -44,14 +45,14 @@ public class Eval {
                 String round = workedArgBrk[i];
 
                 if(hasValidParenthesis(round)){
-                    expressionToEvaluate+=ROUND(round, headers, lineBreak);
+                    expressionToEvaluate+=ROUND(round, headers, lineBreak, table);
                 } else {
                     for (int j = i + 1; j < workedArgBrk.length; j++) {
                         if(!hasValidParenthesis(round)){
                             round+=workedArgBrk[j];
 
                             if(hasValidParenthesis(round)){
-                                expressionToEvaluate+=ROUND(round, headers, lineBreak);
+                                expressionToEvaluate+=ROUND(round, headers, lineBreak, table);
                                 i = j;
                                 break;
                             }
@@ -63,14 +64,14 @@ public class Eval {
 
                 // ! Si de una es válido entonces a evaluar, si no entonces a seguir con la recursiva
                 if(hasValidParenthesis(floor)){
-                    expressionToEvaluate+=FLOOR(floor, headers, lineBreak);
+                    expressionToEvaluate+=FLOOR(floor, headers, lineBreak, table);
                 } else {
                     for (int j = i + 1; j < workedArgBrk.length; j++) {
                         if(!hasValidParenthesis(floor)){
                             floor+=workedArgBrk[j];
     
                             if(hasValidParenthesis(floor)){
-                                expressionToEvaluate+=FLOOR(floor, headers, lineBreak);
+                                expressionToEvaluate+=FLOOR(floor, headers, lineBreak, table);
                                 i = j;
                                 break;
                             }
@@ -81,14 +82,14 @@ public class Eval {
                 String ceil = workedArgBrk[i];
 
                 if(hasValidParenthesis(ceil)){
-                    expressionToEvaluate+=CEIL(ceil, headers, lineBreak);
+                    expressionToEvaluate+=CEIL(ceil, headers, lineBreak, table);
                 } else {
                     for (int j = i + 1; j < workedArgBrk.length; j++) {
                         if(!hasValidParenthesis(ceil)){
                             ceil+=workedArgBrk[j];
 
                             if(hasValidParenthesis(ceil)){
-                                expressionToEvaluate+=CEIL(ceil, headers, lineBreak);
+                                expressionToEvaluate+=CEIL(ceil, headers, lineBreak, table);
                                 i = j;
                                 break;
                             }
@@ -99,14 +100,14 @@ public class Eval {
                 String ucase = workedArgBrk[i];
 
                 if(hasValidParenthesis(ucase)){
-                    expressionToEvaluate+=UCASE(ucase, headers, lineBreak);
+                    expressionToEvaluate+=UCASE(ucase, headers, lineBreak, table);
                 } else {
                     for (int j = i + 1; j < workedArgBrk.length; j++) {
                         if(!hasValidParenthesis(ucase)){
                             ucase+=workedArgBrk[j];
 
                             if(hasValidParenthesis(ucase)){
-                                expressionToEvaluate+=UCASE(ucase, headers, lineBreak);
+                                expressionToEvaluate+=UCASE(ucase, headers, lineBreak, table);
                                 i = j;
                                 break;
                             }
@@ -117,21 +118,75 @@ public class Eval {
                 String lcase = workedArgBrk[i];
 
                 if(hasValidParenthesis(lcase)){
-                    expressionToEvaluate+=LCASE(lcase, headers, lineBreak);
+                    expressionToEvaluate+=LCASE(lcase, headers, lineBreak, table);
                 } else {
                     for (int j = i + 1; j < workedArgBrk.length; j++) {
                         if(!hasValidParenthesis(lcase)){
                             lcase+=workedArgBrk[j];
 
                             if(hasValidParenthesis(lcase)){
-                                expressionToEvaluate+=LCASE(lcase, headers, lineBreak);
+                                expressionToEvaluate+=LCASE(lcase, headers, lineBreak, table);
                                 i = j;
                                 break;
                             }
                         }
                     }
                 }
-            } else
+            } else if(workedArgBrk[i].toUpperCase().startsWith("CAPITALIZE")){
+                String capitalize = workedArgBrk[i];
+
+                if(hasValidParenthesis(capitalize)){
+                    expressionToEvaluate+=CAPITALIZE(capitalize, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(capitalize)){
+                            capitalize+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(capitalize)){
+                                expressionToEvaluate+=CAPITALIZE(capitalize, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("RAND")){
+                String rand = workedArgBrk[i];
+
+                if(hasValidParenthesis(rand)){
+                    expressionToEvaluate+=RAND(rand, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(rand)){
+                            rand+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(rand)){
+                                expressionToEvaluate+=RAND(rand, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("COUNT")){
+                String count = workedArgBrk[i];
+
+                if(hasValidParenthesis(count)){
+                    expressionToEvaluate+=COUNT(count, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(count)){
+                            count+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(count)){
+                                expressionToEvaluate+=COUNT(count, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }  else 
                 expressionToEvaluate+=workedArgBrk[i];
         }
 
@@ -162,13 +217,13 @@ public class Eval {
 
     // -----------------  FUNCTIONS  -----------------
 
-    public static String ROUND(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String ROUND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia ROUND");
 
         String numberToEvaluate = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
-        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak);
+        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
 
         try {
             Double.parseDouble(numberToEvaluate);
@@ -179,24 +234,24 @@ public class Eval {
         return Double.toString(Math.round(Double.parseDouble(numberToEvaluate)));
     }
 
-    public static String FLOOR(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String FLOOR(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia FLOOR");
 
         String numberToEvaluate = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
-        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak);
+        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
         
         return Double.toString(Math.floor(Double.parseDouble(numberToEvaluate)));
     }
 
-    public static String CEIL(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String CEIL(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia CEIL");
 
         String numberToEvaluate = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
-        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak);
+        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
         
         try {
             Double.parseDouble(numberToEvaluate);
@@ -207,9 +262,37 @@ public class Eval {
         return Double.toString(Math.ceil(Double.parseDouble(numberToEvaluate)));
     }
 
+    public static String RAND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia RAND");
+
+        String numberToEvaluate = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+
+        if(numberToEvaluate.isEmpty())
+            return Double.toString((int)random.nextDouble(0, 10000));
+
+        numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
+
+        try {
+            Double.parseDouble(numberToEvaluate);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error en la sentencia RAND: " + numberToEvaluate + " no es un número");
+        }
+
+        if(Double.parseDouble(numberToEvaluate) < 0)
+            throw new IllegalArgumentException("Error en la sentencia RAND: " + numberToEvaluate + " no puede ser negativo");
+        
+        int upperLimit = (int) Double.parseDouble(numberToEvaluate);
+
+        if(upperLimit <= 0)
+            upperLimit = 1;
+        
+        return Double.toString((int)random.nextDouble(0, upperLimit));
+    }
+
     // -----------------  STRING FUNCTIONS  -----------------
 
-    public static String UCASE(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String UCASE(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia UCASE");
 
@@ -222,7 +305,7 @@ public class Eval {
         throw new IllegalArgumentException("No se encontró la columna " + column);
     }
 
-    public static String LCASE(String arg, ArrayList<Header> headers, String[] lineBreak){
+    public static String LCASE(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia LCASE");
 
@@ -234,4 +317,115 @@ public class Eval {
 
         throw new IllegalArgumentException("No se encontró la columna " + column);
     }
+
+    public static String CAPITALIZE(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia CAPITALIZE");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        String value = "";
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                value = lineBreak[headers.get(i).getIndex()];
+        
+        if(value.isEmpty())
+            throw new IllegalArgumentException("No se encontró la columna " + column);
+
+        for(int i = 0; i < value.length(); i++)
+            if(Character.isLetter(value.charAt(i))){
+                value = value.substring(0, i) + Character.toUpperCase(value.charAt(i)) + value.substring(i + 1);
+                break;
+            }
+
+        return value;
+    }
+
+    // -----------------  Group Functions  -----------------
+    public static String COUNT(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(table.size() == 1)
+            return "0";
+        
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia COUNT");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función COUNT: No se especificó la columna");
+
+        if(column.equals("*"))
+            return Integer.toString(table.size() - 1); // ! -1 because of the header (first line)
+
+        int indexOfColumn = -1;
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                indexOfColumn = headers.get(i).getIndex();
+        
+        if(indexOfColumn == -1)
+            throw new IllegalArgumentException("Error en la función COUNT: No se encontró la columna " + column);
+        
+        int count = 0;
+        for (int i = 1; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null"))
+                count++;
+
+        return Integer.toString(count);
+    }
+
+    /* public static String MIN(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(table.size() == 1)
+            throw new IllegalArgumentException("Error en la función MIN: La tabla está vacía");
+        
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia MIN");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función MIN: No se especificó la columna");
+
+        int indexOfColumn = -1;
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                indexOfColumn = headers.get(i).getIndex();
+        
+        if(indexOfColumn == -1)
+            throw new IllegalArgumentException("Error en la función MIN: No se encontró la columna " + column);
+        
+        String min = table.get(1).split(",")[indexOfColumn];
+        for (int i = 2; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null") && table.get(i).split(",")[indexOfColumn].compareTo(min) < 0)
+                min = table.get(i).split(",")[indexOfColumn];
+
+        return min;
+    }
+
+    public static String MAX(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String>table){
+        if(table.size() == 1)
+            throw new IllegalArgumentException("Error en la función MAX: La tabla está vacía");
+        
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia MAX");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función MAX: No se especificó la columna");
+
+        int indexOfColumn = -1;
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                indexOfColumn = headers.get(i).getIndex();
+        
+        if(indexOfColumn == -1)
+            throw new IllegalArgumentException("Error en la función MAX: No se encontró la columna " + column);
+        
+        String max = table.get(1).split(",")[indexOfColumn];
+        for (int i = 2; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null") && table.get(i).split(",")[indexOfColumn].compareTo(max) > 0)
+                max = table.get(i).split(",")[indexOfColumn];
+
+        return max;
+    } */
 }

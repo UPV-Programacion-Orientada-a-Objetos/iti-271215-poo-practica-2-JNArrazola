@@ -112,7 +112,7 @@ public class Select {
                 
                 // Eval.eval(arg, headers, lineBrk);
 
-                System.out.print(Eval.eval(arg, headers, lineBrk) + " ");
+                System.out.print(Eval.eval(arg, headers, lineBrk, resultTable) + " ");
                 // System.out.println(arg);
             }
             System.out.println();

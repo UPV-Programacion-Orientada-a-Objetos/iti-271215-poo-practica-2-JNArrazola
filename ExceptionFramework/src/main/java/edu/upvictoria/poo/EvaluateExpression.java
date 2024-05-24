@@ -4,24 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-
 public class EvaluateExpression {
-    /**
-     * This method is used to convert an infix expression to a postfix expression
-     * Also called Reverse Polish Notation, it is a mathematical notation in which every operator follows all of its operands
-     * @param expression
-     * @return
-      */
+    private static boolean isOperator(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '#';  
+    }
+    
+    private static boolean isNumber(char c) {
+        return Character.isDigit(c) || c == '.';
+    }
+
+    private static boolean isNumber(String token) {
+        try {
+            Double.parseDouble(token);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     private static List<String> infixToPostfix(String expression) throws Exception {
         List<String> output = new ArrayList<>();
         Stack<Character> operators = new Stack<>();
         StringBuilder numberBuffer = new StringBuilder();
 
-        // we are going to iterate over the expression
         for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
-        
-            if (Character.isDigit(c) || c == '.') {
+
+            if (isNumber(c)) {
                 numberBuffer.append(c);
             } else {
                 if (numberBuffer.length() > 0) {
@@ -35,12 +44,6 @@ public class EvaluateExpression {
                         output.add(Character.toString(operators.pop()));
                     }
                     operators.pop();
-                } else if (c == '/' && i + 1 < expression.length() && expression.charAt(i + 1) == '/') {
-                    while (!operators.isEmpty() && precedence('#') <= precedence(operators.peek())) {
-                        output.add(Character.toString(operators.pop()));
-                    }
-                    operators.push('#'); 
-                    i++; 
                 } else if (isOperator(c)) {
                     while (!operators.isEmpty() && precedence(c) <= precedence(operators.peek())) {
                         output.add(Character.toString(operators.pop()));
@@ -61,38 +64,8 @@ public class EvaluateExpression {
         return output;
     }
 
-    /**
-     * This method is used to determine if a character is an operator
-     * @param c
-     * @return
-      */
-    private static boolean isOperator(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '#';  
-    }
-    
-    /**
-     * This method is used to determine the precedence of the operators
-     * +- have a lower precedence than / or #(Integer division)
-     * @param op
-     * @return
-      */
-    private static int precedence(char op) {
-        switch (op) {
-            case '+':
-            case '-':
-                return 1; // lower precedence
-            case '*':
-            case '/':
-            case '%':
-            case '#': // I use this operator to represent integer division
-                return 2; // higher precedence
-        }
-        return -1; // invalid operator
-    }
-
-    private static double evaluatePostfix(List<String> postfix) {
+    private static double evaluatePostfix(List<String> postfix) throws RuntimeException {
         Stack<Double> stack = new Stack<>();
-
         for (String token : postfix) {
             if (isNumber(token)) {
                 stack.push(Double.parseDouble(token));
@@ -116,46 +89,22 @@ public class EvaluateExpression {
                     case '%':
                         if (operand2 == 0) throw new RuntimeException("No se puede dividir entre 0");
                         stack.push(operand1 % operand2);
-                        break; // Modulo
-                    case '#':  
+                        break;
+                    case '#':
                         if (operand2 == 0) throw new RuntimeException("No se puede dividir entre 0");
-                        stack.push((double) ((int) operand1 / (int) operand2)); // division entera
+                        stack.push((double) ((int) operand1 / (int) operand2));
                         break;
                 }
             }
         }
-    
+
         return stack.pop();
     }
 
-    /**
-     * This method is used to determine if a token is a number
-     * @param token
-     * @return
-      */
-    private static boolean isNumber(String token) {
-        try {
-            Double.parseDouble(token);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private static boolean isNumber(char c) {
-        return Character.isDigit(c) || c == '.';
-    }
-
-    /**
-     * This method is used to evaluate an arithmetic expression
-     * @param expression
-      */
     public static String evaluateExpression(String expression) {
-        // ? If it contains NULL in somewhere, im just going to return null
         if(expression.toUpperCase().contains("NULL"))
             return "null";
         
-        // ? If it is empty thats an error
         if(expression.isEmpty())
             throw new RuntimeException("La expresión no puede estar vacía");
         
@@ -169,19 +118,44 @@ public class EvaluateExpression {
         }
         if(!flag) return expression;
 
-
-        if(expression.charAt(0)=='+'||expression.charAt(0)=='-'){
-            String aux = "0";
-            for (int i = 0; i < expression.length(); i++) 
-                aux+=expression.charAt(i);
-            expression = aux;
+        StringBuilder invalidSequence = new StringBuilder();
+        for (int i = 0; i < expression.length(); i++) {
+            char c = expression.charAt(i);
+            if (isNumber(c) || isOperator(c) || c == '(' || c == ')') {
+                if (invalidSequence.length() > 0) {
+                    throw new IllegalArgumentException("Secuencia inválida al evaluar: " + invalidSequence.toString());
+                }
+                invalidSequence.setLength(0); 
+            } else {
+                invalidSequence.append(c);
+            }
         }
+    
+        if (invalidSequence.length() > 0) 
+            throw new IllegalArgumentException("Secuencia inválida: " + invalidSequence.toString());
         
+
         try {
             List<String> postfix = infixToPostfix(expression);
             return Double.toString(evaluatePostfix(postfix));
         } catch (Exception e) {
             return "null";
+        }
+    }
+
+    // Método para determinar la precedencia de los operadores
+    private static int precedence(char op) {
+        switch (op) {
+            case '+':
+            case '-':
+                return 1;
+            case '*':
+            case '/':
+            case '%':
+            case '#':
+                return 2;
+            default:
+                return -1;
         }
     }
 }
