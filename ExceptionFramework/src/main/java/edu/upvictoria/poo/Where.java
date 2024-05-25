@@ -263,4 +263,17 @@ public class Where {
 
 		return resultBoolean;
 	}
+
+	// String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table
+	public static boolean newWhere(String condicionales, String line, String tableName, ArrayList<Header> headers) throws Exception {
+		if (condicionales.equals(""))
+			return true;
+		
+		String headerOfTable = Utilities.getHeaderOfTable(tableName);
+		ArrayList<TypeBuilder> types = FileManagement.decompressInfo(tableName);
+
+
+
+		return true;
+	}
 }

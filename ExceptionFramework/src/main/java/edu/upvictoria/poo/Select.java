@@ -110,10 +110,7 @@ public class Select {
             for (int j = 0; j < argsBreak.length; j++) {
                 String arg = argsBreak[j];
                 
-                // Eval.eval(arg, headers, lineBrk);
-
                 System.out.print(Eval.eval(arg, headers, lineBrk, resultTable) + " ");
-                // System.out.println(arg);
             }
             System.out.println();
         }

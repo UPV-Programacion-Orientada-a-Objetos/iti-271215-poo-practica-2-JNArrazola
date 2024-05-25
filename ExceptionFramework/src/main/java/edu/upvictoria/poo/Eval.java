@@ -186,7 +186,79 @@ public class Eval {
                         }
                     }
                 }
-            }  else 
+            }  else if(workedArgBrk[i].toUpperCase().startsWith("AVG")){
+                String avg = workedArgBrk[i];
+
+                if(hasValidParenthesis(avg)){
+                    expressionToEvaluate+=AVG(avg, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(avg)){
+                            avg+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(avg)){
+                                expressionToEvaluate+=AVG(avg, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("MIN")){
+                String min = workedArgBrk[i];
+
+                if(hasValidParenthesis(min)){
+                    expressionToEvaluate+=MIN(min, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(min)){
+                            min+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(min)){
+                                expressionToEvaluate+=MIN(min, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("MAX")){
+                String max = workedArgBrk[i];
+
+                if(hasValidParenthesis(max)){
+                    expressionToEvaluate+=MAX(max, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(max)){
+                            max+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(max)){
+                                expressionToEvaluate+=MAX(max, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else if(workedArgBrk[i].toUpperCase().startsWith("SUM")){
+                String sum = workedArgBrk[i];
+
+                if(hasValidParenthesis(sum)){
+                    expressionToEvaluate+=SUM(sum, headers, lineBreak, table);
+                } else {
+                    for (int j = i + 1; j < workedArgBrk.length; j++) {
+                        if(!hasValidParenthesis(sum)){
+                            sum+=workedArgBrk[j];
+
+                            if(hasValidParenthesis(sum)){
+                                expressionToEvaluate+=SUM(sum, headers, lineBreak, table);
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else 
                 expressionToEvaluate+=workedArgBrk[i];
         }
 
@@ -373,9 +445,53 @@ public class Eval {
         return Integer.toString(count);
     }
 
-    /* public static String MIN(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String AVG(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(table.size() == 1)
-            throw new IllegalArgumentException("Error en la función MIN: La tabla está vacía");
+            return "0";
+        
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia AVG");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función AVG: No se especificó la columna");
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("Error en la función AVG: No se puede usar *");
+
+        int indexOfColumn = -1;
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                indexOfColumn = headers.get(i).getIndex();
+        
+        if(indexOfColumn == -1)
+            throw new IllegalArgumentException("Error en la función AVG: No se encontró la columna " + column);
+        
+        double sum = 0;
+        int count = 0;
+        for (int i = 1; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null")){
+
+                try {
+                    Double.parseDouble(table.get(i).split(",")[indexOfColumn]);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Error en la función AVG: " + table.get(i).split(",")[indexOfColumn] + " no es un número");
+                }
+
+                sum+=Double.parseDouble(table.get(i).split(",")[indexOfColumn]);
+                count++;
+            }
+
+        if(count == 0)
+            return "0";
+
+        return Double.toString(sum / count);
+    }
+
+    public static String MIN(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(table.size() == 1)
+            return "0";
         
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia MIN");
@@ -385,6 +501,9 @@ public class Eval {
         if(column.isEmpty())
             throw new IllegalArgumentException("Error en la función MIN: No se especificó la columna");
 
+        if(column.equals("*"))
+            throw new IllegalArgumentException("Error en la función MIN: No se puede usar *");
+
         int indexOfColumn = -1;
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))
@@ -393,17 +512,18 @@ public class Eval {
         if(indexOfColumn == -1)
             throw new IllegalArgumentException("Error en la función MIN: No se encontró la columna " + column);
         
-        String min = table.get(1).split(",")[indexOfColumn];
-        for (int i = 2; i < table.size(); i++) 
-            if(!table.get(i).split(",")[indexOfColumn].equals("null") && table.get(i).split(",")[indexOfColumn].compareTo(min) < 0)
-                min = table.get(i).split(",")[indexOfColumn];
+        String min = "null";
+        for (int i = 1; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null"))
+                if(min.equals("null") || table.get(i).split(",")[indexOfColumn].compareTo(min) < 0)
+                    min = table.get(i).split(",")[indexOfColumn];
 
         return min;
-    }
+    } 
 
-    public static String MAX(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String>table){
+    public static String MAX(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
         if(table.size() == 1)
-            throw new IllegalArgumentException("Error en la función MAX: La tabla está vacía");
+            return "0";
         
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia MAX");
@@ -413,6 +533,9 @@ public class Eval {
         if(column.isEmpty())
             throw new IllegalArgumentException("Error en la función MAX: No se especificó la columna");
 
+        if(column.equals("*"))
+            throw new IllegalArgumentException("Error en la función MAX: No se puede usar *");
+
         int indexOfColumn = -1;
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))
@@ -421,11 +544,51 @@ public class Eval {
         if(indexOfColumn == -1)
             throw new IllegalArgumentException("Error en la función MAX: No se encontró la columna " + column);
         
-        String max = table.get(1).split(",")[indexOfColumn];
-        for (int i = 2; i < table.size(); i++) 
-            if(!table.get(i).split(",")[indexOfColumn].equals("null") && table.get(i).split(",")[indexOfColumn].compareTo(max) > 0)
-                max = table.get(i).split(",")[indexOfColumn];
+        String max = "null";
+        for (int i = 1; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null"))
+                if(max.equals("null") || table.get(i).split(",")[indexOfColumn].compareTo(max) > 0)
+                    max = table.get(i).split(",")[indexOfColumn];
 
         return max;
-    } */
+    }
+
+    public static String SUM(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+        if(table.size() == 1)
+            return "0";
+        
+        if(!arg.contains("(")||!arg.contains(")"))
+            throw new IllegalArgumentException("Error en los paréntesis en la sentencia SUM");
+
+        String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
+        
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función SUM: No se especificó la columna");
+
+        if(column.equals("*"))
+            throw new IllegalArgumentException("Error en la función SUM: No se puede usar *");
+
+        int indexOfColumn = -1;
+        for (int i = 0; i < headers.size(); i++) 
+            if(headers.get(i).getName().equals(column))
+                indexOfColumn = headers.get(i).getIndex();
+        
+        if(indexOfColumn == -1)
+            throw new IllegalArgumentException("Error en la función SUM: No se encontró la columna " + column);
+        
+        double sum = 0;
+        for (int i = 1; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equals("null")){
+
+                try {
+                    Double.parseDouble(table.get(i).split(",")[indexOfColumn]);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Error en la función SUM: " + table.get(i).split(",")[indexOfColumn] + " no es un número");
+                }
+
+                sum+=Double.parseDouble(table.get(i).split(",")[indexOfColumn]);
+            }
+
+        return Double.toString(sum);
+    }
 }
