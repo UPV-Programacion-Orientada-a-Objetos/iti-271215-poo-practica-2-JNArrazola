@@ -1,9 +1,6 @@
 package edu.upvictoria.poo;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -56,21 +53,6 @@ public class Select {
         if(query.toUpperCase().contains("WHERE")&&conditionals.isEmpty())
             throw new IllegalArgumentException("WHERE vacío");
 
-        ArrayList<String> resultTable = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(
-                new FileReader(FileManagement.getDatabasePath() + tableName + ".csv"))) {
-            String line;
-            resultTable.add(line = br.readLine());
-            while ((line = br.readLine()) != null) {
-                if (Where.manageWhere(conditionals, line, tableName))
-                    resultTable.add(line);
-            }
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        } catch (IOException e) {
-            throw new IOException("No se pudo abrir el archivo");
-        }
-
         // ! All this block is to manage the headers of the table
         String headerOfTable = Utilities.getHeaderOfTable(tableName);
         ArrayList<Header> headers = new ArrayList<>();
@@ -83,15 +65,21 @@ public class Select {
         // i mean, sort them in non increasing order
 
         // ? Here i have the sorted headers, to replace them in the query
-        headers.sort((h1, h2) -> h2.getIndex() - h1.getIndex());
+        headers.sort((h1, h2) -> h2.getName().length() - h1.getName().length());
 
         // ? Here they are the args for the query
         String[] argsBreak = argsStr.split(",");
         for (int i = 0; i < argsBreak.length; i++) 
             argsBreak[i] = argsBreak[i].trim();
 
-        // Firstly i have to replace all the header columns with the actual values
-
+        ArrayList<String> resultTable = new ArrayList<>();
+        ArrayList<String> table = Utilities.getTable(tableName);
+        for (int i = 1; i < table.size(); i++) {
+            String[] lineBrk = table.get(i).split(",");
+            if(Where.newWhere(conditionals, headers, lineBrk, table))
+                resultTable.add(table.get(i));
+        }
+        
         if(argsBreak[0].equals("*")){  
             if(argsBreak.length!=1)
                 throw new IllegalArgumentException("No se puede colocar más de dos columnas en un select *");
@@ -103,7 +91,7 @@ public class Select {
         }
 
         // ! First i iterate through the result table
-        for (int i = 1; i < resultTable.size(); i++) {
+        for (int i = 0; i < resultTable.size(); i++) {
             String[] lineBrk = resultTable.get(i).split(",");
 
             // ! Then i iterate through the args

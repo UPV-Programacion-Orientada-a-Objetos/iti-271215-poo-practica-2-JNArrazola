@@ -3,6 +3,11 @@ package edu.upvictoria.poo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import java.util.Queue;
+import java.util.LinkedList;
+
+
+
 public class Where {
 	/**
 	 * Steps to do it
@@ -264,16 +269,156 @@ public class Where {
 		return resultBoolean;
 	}
 
-	// String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table
-	public static boolean newWhere(String condicionales, String line, String tableName, ArrayList<Header> headers) throws Exception {
+	/**
+	 * Argumentos
+	 * 
+	 * @param condicionales trae todos los condicionales de la sentencia where
+	 * @param line trae la línea actual que se va a evaluar
+	 * @param headers trae los headers de la tabla
+	 * @param lineBreak trae la línea actual separada por comas
+	 * @param table trae la tabla actual
+	 * @return
+	 * @throws Exception
+	  */
+	public static boolean newWhere(String condicionales, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception {
 		if (condicionales.equals(""))
 			return true;
+
+		condicionales = condicionales.trim();
+
+		if(condicionales.startsWith("(")&&condicionales.endsWith(")"))
+			condicionales = condicionales.substring(1, condicionales.length()-1);
+
+		String stringToProcess = "", actualString = "";
 		
-		String headerOfTable = Utilities.getHeaderOfTable(tableName);
-		ArrayList<TypeBuilder> types = FileManagement.decompressInfo(tableName);
+		String[] conditionalsBreak = condicionales.split(" ");
+		for (int i = 0; i < conditionalsBreak.length; i++) {
+			actualString += conditionalsBreak[i] + " ";
+			if(hasValidParenthesis(actualString)) {
+				if(actualString.equals(conditionalsBreak[i] + " ")){
+					stringToProcess += conditionalsBreak[i] + " ";
+				} else {
+					stringToProcess+=Boolean.toString(newWhere(actualString, headers, lineBreak, table));
+				}
+				actualString = "";
+			} 
+		}
 
+		Queue<String> operators = new LinkedList<String>();
+		Queue<String> conditionals = new LinkedList<String>();
 
+		String[] stringToProcess2 = stringToProcess.split(" ");
 
-		return true;
+		String str = "";
+		for (int i = 0; i < stringToProcess2.length; i++) {
+			if(Utilities.isLogic(stringToProcess2[i])) {
+				operators.add(stringToProcess2[i].trim());
+				conditionals.add(str.trim());
+				str = "";
+			} else 
+				str += stringToProcess2[i] + " ";
+		}
+		if(!str.equals(""))
+			conditionals.add(str.trim());
+
+		return evalFunction(headers, lineBreak, table, operators, conditionals);
 	}
+
+	public static boolean evalFunction(ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table, Queue<String> operators, Queue<String> conditionals) throws Exception {
+		String comparator = "";
+
+		String conditional = conditionals.poll();
+
+		if(conditional.startsWith("(")&&conditional.endsWith(")"))
+			conditional = conditional.substring(1, conditional.length()-1);
+		
+		if(conditional.equalsIgnoreCase("TRUE"))
+			return true;
+		else if(conditional.equalsIgnoreCase("FALSE"))
+			return false;
+
+		String[] parts;
+		if(conditional.contains("<>")) {
+			comparator = "<>";
+			conditional = conditional.replace("<>", ",");
+		} else if(conditional.contains("<=")) {
+			comparator = "<=";
+			conditional = conditional.replace("<=", ",");
+		} else if(conditional.contains(">=")) {
+			comparator = ">=";
+			conditional = conditional.replace(">=", ",");
+		} else if(conditional.contains("<")) {
+			comparator = "<";
+			conditional = conditional.replace("<", ",");
+		} else if(conditional.contains(">")) {
+			comparator = ">";
+			conditional = conditional.replace(">", ",");
+		} else if(conditional.contains("!=")) {
+			comparator = "!=";
+			conditional = conditional.replace("!=", ",");
+		} else if(conditional.contains("=")) {
+			comparator = "=";
+			conditional = conditional.replace("=", ",");
+		} else {
+			throw new IllegalArgumentException("Operador no encontrado en la sentencia WHERE: " + conditional);
+		}
+
+		parts = conditional.split(",");
+
+		if(parts.length != 2)
+			throw new IllegalArgumentException("Error en la sentencia WHERE: " + conditional + comparator);
+
+		String firstPart = Eval.eval(parts[0].trim(), headers, lineBreak, table);
+		String secondPart = Eval.eval(parts[1].trim(), headers, lineBreak, table);
+
+		boolean resultBoolean = false;
+		switch (comparator) {
+			case "=":
+				resultBoolean = firstPart.equals(secondPart);
+				break;
+			case "!=":
+				resultBoolean = !firstPart.equals(secondPart);
+				break;
+			case "<=":
+				resultBoolean = firstPart.compareTo(secondPart) <= 0;
+				break;
+			case ">=":
+				resultBoolean = firstPart.compareTo(secondPart) >= 0;
+				break;
+			case "<":
+				resultBoolean = firstPart.compareTo(secondPart) < 0;
+				break;
+			case ">":
+				resultBoolean = firstPart.compareTo(secondPart) > 0;
+				break;
+			case "<>":
+				resultBoolean = !firstPart.equals(secondPart);
+				break;
+			default:
+				break;
+		}
+
+		if(operators.isEmpty())
+			return resultBoolean;
+		
+		String operator = operators.poll();
+		if(operator.equalsIgnoreCase("AND"))
+			return resultBoolean && evalFunction(headers, lineBreak, table, operators, conditionals);
+		else
+			return resultBoolean || evalFunction(headers, lineBreak, table, operators, conditionals);
+	}
+
+	// Aux Function
+	public static boolean hasValidParenthesis(String arg){
+        int ctr = 0;
+
+        for (int i = 0; i < arg.length(); i++) {
+            if(arg.charAt(i) == '(') ctr++;
+            if(arg.charAt(i) == ')') ctr--;
+
+            if(ctr < 0) return false;
+        }
+
+        return ctr == 0;
+    }
 }

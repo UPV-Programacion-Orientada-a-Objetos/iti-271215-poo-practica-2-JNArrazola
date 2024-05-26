@@ -286,4 +286,17 @@ public class Utilities {
         return "NF";
     }
 
+    public static ArrayList<String> getTable(String tableName){
+        ArrayList<String> table = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(FileManagement.getDatabasePath() + tableName + ".csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                table.add(line);
+            }
+        } catch (Exception e) {
+            System.out.println("No se pudo abrir el archivo");
+        }
+
+        return table;
+    }
 }
