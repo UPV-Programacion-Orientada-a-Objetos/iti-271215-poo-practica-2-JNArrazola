@@ -1,6 +1,14 @@
 id,name,money,height
 1,'pedro',1000,1.60
 2,'manuel',2500,1.90
-3,'manuel',2500,1.70
+3,'prueba',2500,1.70
 4,'manuel',1500,1.70
-5,'jose',null,1.85
+5,'jose',3100,1.75
+6,'fanny',2900,1.63
+7,'joshua',8300,1.65
+8,'said',5100,1.77
+9,'sandy',null,1.65
+10,'jesus',null,1.90
+11,'dariana',9000,1.60
+12,'frida',2000,1.40
+13,'jess',500,1.55

@@ -2,6 +2,7 @@ package edu.upvictoria.poo;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Steps to do it
@@ -13,10 +14,10 @@ import java.util.ArrayList;
  */
 public class Select {
     public static String select(String query) throws Exception {
-        query = query.replace("DIV", "#");
-        query = query.replace("div", "#");
-        query = query.replace("MOD", "%");
-        query = query.replace("mod", "%");
+        query = query.replace(" DIV ", "#");
+        query = query.replace(" div ", "#");
+        query = query.replace(" MOD ", "%");
+        query = query.replace(" mod ", "%");
         
         if (FileManagement.getDatabasePath() == null)
             throw new FileNotFoundException("No se ha accedido a ninguna base de datos");
@@ -35,15 +36,15 @@ public class Select {
                 index = i;
                 break;
             }
-            argsStr+=queryBrk[i];
+            argsStr+=queryBrk[i] + " ";
         }
-        
+
         if(index + 1 >= queryBrk.length)
-            throw new IllegalArgumentException("Nombre de la tabla incompleto");
+            throw new IllegalArgumentException("Nombre de la tabla incompleto: " + query);
         tableName = queryBrk[++index];
 
         if(!FileManagement.searchForTable(tableName))
-            throw new FileNotFoundException("No se encontró la tabla");
+            throw new FileNotFoundException("No se encontró la tabla: " + tableName);
 
         if(index + 2 < queryBrk.length && queryBrk[index + 1].equalsIgnoreCase("WHERE"))
             for(int i = index + 2; i < queryBrk.length; i++)
@@ -72,6 +73,35 @@ public class Select {
         for (int i = 0; i < argsBreak.length; i++) 
             argsBreak[i] = argsBreak[i].trim();
 
+        // * Here im going to handle aliases
+        HashMap<String, String> aliases = new HashMap<>();
+        for (int i = 0; i < argsBreak.length; i++) {
+            String[] parts = argsBreak[i].split(" ");
+            String formedStr = "";
+
+            for (int j = 0; j < parts.length; j++){
+                if(parts[j].equalsIgnoreCase("as")){
+                    
+                    argsBreak[i] = formedStr.trim();
+                    formedStr = "";
+
+                    for (int k = j + 1; k < parts.length; k++) 
+                        formedStr += parts[k] + " ";
+
+                    if(formedStr.trim().isEmpty())
+                        throw new IllegalArgumentException("Alias vacío");
+                    
+                    formedStr = formedStr.trim();
+                    if(!formedStr.startsWith("'")||!formedStr.endsWith("'"))
+                        throw new IllegalArgumentException("Alias no está entre comillas: " + formedStr);
+                    
+                    aliases.put(argsBreak[i], formedStr.trim());
+                }
+                formedStr += parts[j] + " ";
+            }
+        }
+        // * End of handling aliases
+
         ArrayList<String> resultTable = new ArrayList<>();
         ArrayList<String> table = Utilities.getTable(tableName);
         for (int i = 1; i < table.size(); i++) {
@@ -84,24 +114,49 @@ public class Select {
             if(argsBreak.length!=1)
                 throw new IllegalArgumentException("No se puede colocar más de dos columnas en un select *");
 
+            headers.sort((h1, h2) -> h1.getIndex() - h2.getIndex());
+
+            for(int i = 0; i < headers.size(); i++)
+                System.out.print(headers.get(i).getName() + " ");
+            System.out.println();
+            
             for (int i = 0; i < resultTable.size(); i++) 
                 System.out.println(resultTable.get(i));
             
             return "Select realizado con éxito";
         }
 
+        ArrayList<String> finaltable = new ArrayList<>();
+        
+        // * Here i print headers
+        String header = "";
+        for (int i = 0; i < argsBreak.length; i++) {
+            if(aliases.containsKey(argsBreak[i]))
+                header+= aliases.get(argsBreak[i]) + ",";
+            else
+                header+=argsBreak[i] + ",";
+        }
+        if(header.endsWith(","))
+            header = header.substring(0, header.length() - 1);
+        finaltable.add(header);
+
         // ! First i iterate through the result table
         for (int i = 0; i < resultTable.size(); i++) {
             String[] lineBrk = resultTable.get(i).split(",");
+            String line = "";
 
             // ! Then i iterate through the args
             for (int j = 0; j < argsBreak.length; j++) {
                 String arg = argsBreak[j];
-                
-                System.out.print(Eval.eval(arg, headers, lineBrk, resultTable) + " ");
+                line+=Eval.eval(arg, headers, lineBrk, resultTable) + ",";
             }
-            System.out.println();
+            if(line.endsWith(","))
+                line = line.substring(0, line.length() - 1);
+            finaltable.add(line);
         }
+
+        for (int i = 0; i < finaltable.size(); i++) 
+            System.out.println(finaltable.get(i));
 
         return "Select realizado con éxito";
     }

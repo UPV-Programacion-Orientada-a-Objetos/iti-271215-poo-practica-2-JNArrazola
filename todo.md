@@ -1,5 +1,7 @@
 # Cosas pendientes
 
-- Hacer el árbol del where
-- Select DISTINCT
-- Añadir validación si es una función no válida
+- [X] Hacer el árbol del where
+- [X] Añadir validación si es una función no válida
+- [ ] Select DISTINCT (programado pero no implementado)
+- [ ] Cambiar el where en las funciones update y delete
+- [ ] Crear test cases

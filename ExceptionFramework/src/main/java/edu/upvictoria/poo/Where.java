@@ -321,6 +321,9 @@ public class Where {
 		if(!str.equals(""))
 			conditionals.add(str.trim());
 
+		if(conditionals.size() - 1 != operators.size())
+			throw new IllegalArgumentException("Sentencia WHERE inválida: Los operadores no coinciden con los condicionales");
+
 		return evalFunction(headers, lineBreak, table, operators, conditionals);
 	}
 
@@ -332,11 +335,19 @@ public class Where {
 		if(conditional.startsWith("(")&&conditional.endsWith(")"))
 			conditional = conditional.substring(1, conditional.length()-1);
 		
-		if(conditional.equalsIgnoreCase("TRUE"))
-			return true;
-		else if(conditional.equalsIgnoreCase("FALSE"))
-			return false;
+		// * Recursive call when i already solved a parenthesis before in the recursive calls
+		if(conditional.equalsIgnoreCase("TRUE")||conditional.equalsIgnoreCase("FALSE")){
+			if(operators.isEmpty())
+				return Boolean.parseBoolean(conditional);
+			
+			String operator = operators.poll();
+			if(operator.equalsIgnoreCase("AND"))
+				return Boolean.parseBoolean(conditional) && evalFunction(headers, lineBreak, table, operators, conditionals);
+			else
+				return Boolean.parseBoolean(conditional) || evalFunction(headers, lineBreak, table, operators, conditionals);
+		}
 
+		// ? Handle the different comparators
 		String[] parts;
 		if(conditional.contains("<>")) {
 			comparator = "<>";
@@ -360,7 +371,7 @@ public class Where {
 			comparator = "=";
 			conditional = conditional.replace("=", ",");
 		} else {
-			throw new IllegalArgumentException("Operador no encontrado en la sentencia WHERE: " + conditional);
+			throw new IllegalArgumentException("Operador no encontrado en la sentencia WHERE: '" + conditional + "'");
 		}
 
 		parts = conditional.split(",");
@@ -371,28 +382,65 @@ public class Where {
 		String firstPart = Eval.eval(parts[0].trim(), headers, lineBreak, table);
 		String secondPart = Eval.eval(parts[1].trim(), headers, lineBreak, table);
 
+		// ? Handle the case when one of the parts is NULL
+		if(firstPart.equalsIgnoreCase("NULL")||secondPart.equalsIgnoreCase("NULL")){
+			if(operators.isEmpty())
+				return false;
+			String operatorStr = operators.poll();
+			if(operatorStr.equalsIgnoreCase("OR"))
+				return false || evalFunction(headers, lineBreak, table, operators, conditionals);
+		}
+
 		boolean resultBoolean = false;
 		switch (comparator) {
 			case "=":
-				resultBoolean = firstPart.equals(secondPart);
+				try {
+					resultBoolean = Double.parseDouble(firstPart) == Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = firstPart.equals(secondPart);
+				}
 				break;
 			case "!=":
-				resultBoolean = !firstPart.equals(secondPart);
+				try {
+					resultBoolean = Double.parseDouble(firstPart) != Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = !firstPart.equals(secondPart);
+				}
 				break;
 			case "<=":
-				resultBoolean = firstPart.compareTo(secondPart) <= 0;
+				try {
+					resultBoolean = Double.parseDouble(firstPart) <= Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = firstPart.compareTo(secondPart) <= 0;
+				}
 				break;
 			case ">=":
-				resultBoolean = firstPart.compareTo(secondPart) >= 0;
+				try {
+					resultBoolean = Double.parseDouble(firstPart) >= Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = firstPart.compareTo(secondPart) >= 0;
+				}
 				break;
 			case "<":
-				resultBoolean = firstPart.compareTo(secondPart) < 0;
+				try {
+					resultBoolean = Double.parseDouble(firstPart) < Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = firstPart.compareTo(secondPart) < 0;
+				}
 				break;
 			case ">":
-				resultBoolean = firstPart.compareTo(secondPart) > 0;
+				try {
+					resultBoolean = Double.parseDouble(firstPart) > Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = firstPart.compareTo(secondPart) > 0;
+				}
 				break;
 			case "<>":
-				resultBoolean = !firstPart.equals(secondPart);
+				try {
+					resultBoolean = Double.parseDouble(firstPart) != Double.parseDouble(secondPart);
+				} catch(NumberFormatException e) {
+					resultBoolean = !firstPart.equals(secondPart);
+				}
 				break;
 			default:
 				break;

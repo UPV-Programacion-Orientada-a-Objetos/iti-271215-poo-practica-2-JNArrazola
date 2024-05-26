@@ -20,7 +20,7 @@ public class Eval {
      * Function to evaluate the query
      * @param query
      */
-    public static String eval(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String eval(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception {
         String workedArg = "";
 
         arg = arg.trim();
@@ -258,8 +258,31 @@ public class Eval {
                         }
                     }
                 }
-            } else 
-                expressionToEvaluate+=workedArgBrk[i];
+            } else {
+                // * Si no es un numero y no es una columna entonces lanzar excepción
+                if(Utilities.isArithmeticOperator(workedArgBrk[i])){
+                    expressionToEvaluate+=workedArgBrk[i];
+                    continue;
+                }
+
+                try {
+                    Double.parseDouble(workedArgBrk[i]);
+                } catch (Exception e) {
+                    boolean isColumn = false;
+                    for (int j = 0; j < headers.size(); j++) 
+                        if(headers.get(j).getName().equals(workedArgBrk[i])){
+                            isColumn = true;
+                            break;
+                        }
+                    
+                    if(workedArgBrk[i].startsWith("'")&&workedArgBrk[i].endsWith("'"))
+                        isColumn = true;
+                    
+                    if(!isColumn)
+                        throw new IllegalArgumentException("Error en la sentencia: " + workedArgBrk[i] + " no es un número ni una columna");
+                }
+                expressionToEvaluate+=workedArgBrk[i].trim();
+            }
         }
 
         for (int k = 0; k < headers.size(); k++) 
@@ -289,7 +312,7 @@ public class Eval {
 
     // -----------------  FUNCTIONS  -----------------
 
-    public static String ROUND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String ROUND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception{
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia ROUND");
 
@@ -306,7 +329,7 @@ public class Eval {
         return Double.toString(Math.round(Double.parseDouble(numberToEvaluate)));
     }
 
-    public static String FLOOR(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String FLOOR(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception{
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia FLOOR");
 
@@ -317,7 +340,7 @@ public class Eval {
         return Double.toString(Math.floor(Double.parseDouble(numberToEvaluate)));
     }
 
-    public static String CEIL(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String CEIL(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception{
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia CEIL");
 
@@ -334,7 +357,7 @@ public class Eval {
         return Double.toString(Math.ceil(Double.parseDouble(numberToEvaluate)));
     }
 
-    public static String RAND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
+    public static String RAND(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception{
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia RAND");
 
@@ -370,6 +393,12 @@ public class Eval {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función UCASE: No se especificó la columna");
+
+        if(column.startsWith("'")&&column.endsWith("'"))
+            return column.toUpperCase();
+
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))
                 return lineBreak[headers.get(i).getIndex()].toUpperCase();
@@ -383,6 +412,12 @@ public class Eval {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función LCASE: No se especificó la columna");
+
+        if(column.startsWith("'")&&column.endsWith("'"))
+            return column.toLowerCase();
+
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))
                 return lineBreak[headers.get(i).getIndex()].toLowerCase();
@@ -396,6 +431,20 @@ public class Eval {
 
         String column = arg.substring(arg.indexOf("(") + 1, arg.length() - 1);
         
+        if(column.isEmpty())
+            throw new IllegalArgumentException("Error en la función CAPITALIZE: No se especificó la columna");
+
+        if(column.startsWith("'")&&column.endsWith("'")){
+            String value = column;
+            for(int i = 0; i < value.length(); i++)
+            if(Character.isLetter(value.charAt(i))){
+                value = value.substring(0, i) + Character.toUpperCase(value.charAt(i)) + value.substring(i + 1);
+                break;
+            }
+            return value;
+        }
+
+
         String value = "";
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))

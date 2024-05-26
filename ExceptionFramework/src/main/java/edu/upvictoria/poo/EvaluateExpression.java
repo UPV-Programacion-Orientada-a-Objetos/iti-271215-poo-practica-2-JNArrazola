@@ -116,30 +116,13 @@ public class EvaluateExpression {
                 break;
             }
         }
-        if(!flag) return expression;
-
-        StringBuilder invalidSequence = new StringBuilder();
-        for (int i = 0; i < expression.length(); i++) {
-            char c = expression.charAt(i);
-            if (isNumber(c) || isOperator(c) || c == '(' || c == ')') {
-                if (invalidSequence.length() > 0) {
-                    throw new IllegalArgumentException("Secuencia inválida al evaluar: " + invalidSequence.toString());
-                }
-                invalidSequence.setLength(0); 
-            } else {
-                invalidSequence.append(c);
-            }
-        }
-    
-        if (invalidSequence.length() > 0) 
-            throw new IllegalArgumentException("Secuencia inválida: " + invalidSequence.toString());
-        
+        if(!flag) return expression;        
 
         try {
             List<String> postfix = infixToPostfix(expression);
             return Double.toString(evaluatePostfix(postfix));
         } catch (Exception e) {
-            return "null";
+            throw new RuntimeException("Error al evaluar la expresión: " + e.getMessage());
         }
     }
 

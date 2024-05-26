@@ -17,7 +17,7 @@ public class Utilities {
     private static final Set<String> reservedWords = new HashSet<String>();
     private static final Set<String> types = new HashSet<String>();
     private static final Set<String> logicOperators = new HashSet<>();
-    private static final Set<Character> ArithmeticOperators = new HashSet<>();
+    private static final Set<String> ArithmeticOperators = new HashSet<>();
     private static final ArrayList<String> numericFunctions = new ArrayList<>();
     private static final Set<Character> validCharactersInOperation = new HashSet<>();
     private static final ArrayList<String> aggregateFunctions = new ArrayList<>();
@@ -113,12 +113,12 @@ public class Utilities {
     }
 
     public static void fillArithmeticOperators(){
-        ArithmeticOperators.add('+');
-        ArithmeticOperators.add('-');
-        ArithmeticOperators.add('*');
-        ArithmeticOperators.add('/');
-        ArithmeticOperators.add('|');
-        ArithmeticOperators.add('%');
+        ArithmeticOperators.add("+");
+        ArithmeticOperators.add("-");
+        ArithmeticOperators.add("*");
+        ArithmeticOperators.add("/");
+        ArithmeticOperators.add("#");
+        ArithmeticOperators.add("%");
     }
 
     public static void fillNumericFunctions(){
@@ -163,7 +163,7 @@ public class Utilities {
         return logicOperators.contains(logic.toUpperCase());
     }
 
-    public static boolean isArithmeticOperator(Character operator){
+    public static boolean isArithmeticOperator(String operator){
         return ArithmeticOperators.contains(operator); 
     }
 
