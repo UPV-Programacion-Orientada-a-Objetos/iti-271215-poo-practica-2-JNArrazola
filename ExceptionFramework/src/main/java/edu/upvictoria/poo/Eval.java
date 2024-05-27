@@ -259,29 +259,7 @@ public class Eval {
                     }
                 }
             } else {
-                // * Si no es un numero y no es una columna entonces lanzar excepción
-                if(Utilities.isArithmeticOperator(workedArgBrk[i])){
-                    expressionToEvaluate+=workedArgBrk[i];
-                    continue;
-                }
-
-                try {
-                    Double.parseDouble(workedArgBrk[i]);
-                } catch (Exception e) {
-                    boolean isColumn = false;
-                    for (int j = 0; j < headers.size(); j++) 
-                        if(headers.get(j).getName().equals(workedArgBrk[i])){
-                            isColumn = true;
-                            break;
-                        }
-                    
-                    if(workedArgBrk[i].startsWith("'")&&workedArgBrk[i].endsWith("'"))
-                        isColumn = true;
-                    
-                    if(!isColumn)
-                        throw new IllegalArgumentException("Error en la sentencia: '" + workedArgBrk[i] + "' no es un número ni una columna");
-                }
-                expressionToEvaluate+=workedArgBrk[i].trim();
+                expressionToEvaluate += workedArgBrk[i];
             }
         }
 

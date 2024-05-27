@@ -289,18 +289,32 @@ public class Parser {
         if (parts.length > 6)
             throw new RuntimeException("Query inválida");
 
-        String name = parts[2];
+        String name = "";
+        try {
+            name = parts[2];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("Faltó el nombre de la tabla");
+        }
 
         if (!FileManagement.searchForTable(name))
             throw new FileNotFoundException("No se encontró el archivo");
 
-        String columns = parts[3];
+        String columns = "";
+        try {
+            columns = parts[3];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("Faltaron columnas en el insert into");
+        }
 
         if (columns.equalsIgnoreCase("VALUES"))
             throw new IllegalArgumentException("Falta especificar columnas");
 
-        if (!parts[4].equalsIgnoreCase("VALUES"))
-            throw new IllegalArgumentException("Sintaxis no válida");
+        try {
+            if (!parts[4].equalsIgnoreCase("VALUES"))
+                throw new IllegalArgumentException("Sintaxis no válida");
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("Faltaron valores en el insert into");
+        }
 
         String values = parts[5];
 
