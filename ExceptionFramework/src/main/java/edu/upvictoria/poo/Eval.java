@@ -279,7 +279,7 @@ public class Eval {
                         isColumn = true;
                     
                     if(!isColumn)
-                        throw new IllegalArgumentException("Error en la sentencia: " + workedArgBrk[i] + " no es un número ni una columna");
+                        throw new IllegalArgumentException("Error en la sentencia: '" + workedArgBrk[i] + "' no es un número ni una columna");
                 }
                 expressionToEvaluate+=workedArgBrk[i].trim();
             }
@@ -421,6 +421,8 @@ public class Eval {
         for (int i = 0; i < headers.size(); i++) 
             if(headers.get(i).getName().equals(column))
                 return lineBreak[headers.get(i).getIndex()].toLowerCase();
+            
+            
 
         throw new IllegalArgumentException("No se encontró la columna " + column);
     }

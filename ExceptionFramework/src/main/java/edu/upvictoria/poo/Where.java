@@ -280,14 +280,17 @@ public class Where {
 	 * @return
 	 * @throws Exception
 	  */
-	public static boolean newWhere(String condicionales, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table) throws Exception {
+	public static boolean newWhere(String condicionales, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table, String lastCall) throws Exception {
 		if (condicionales.equals(""))
 			return true;
 
+		if(condicionales.equalsIgnoreCase(lastCall))
+			throw new IllegalArgumentException("Error en la sentencia WHERE: " + condicionales);
+
 		condicionales = condicionales.trim();
 
-		if(condicionales.startsWith("(")&&condicionales.endsWith(")"))
-			condicionales = condicionales.substring(1, condicionales.length()-1);
+		//if(condicionales.startsWith("(")&&condicionales.endsWith(")"))
+		//	condicionales = condicionales.substring(1, condicionales.length()-1);
 
 		String stringToProcess = "", actualString = "";
 		
@@ -298,17 +301,22 @@ public class Where {
 				if(actualString.equals(conditionalsBreak[i] + " ")){
 					stringToProcess += conditionalsBreak[i] + " ";
 				} else {
-					stringToProcess+=Boolean.toString(newWhere(actualString, headers, lineBreak, table));
+					actualString = actualString.trim();
+					if(actualString.startsWith("(")&&actualString.endsWith(")"))
+						actualString = actualString.substring(1, actualString.length()-1);
+					
+					stringToProcess+=Boolean.toString(newWhere(actualString, headers, lineBreak, table, condicionales)) + " ";
 				}
 				actualString = "";
 			} 
 		}
+		
 
 		Queue<String> operators = new LinkedList<String>();
 		Queue<String> conditionals = new LinkedList<String>();
 
 		String[] stringToProcess2 = stringToProcess.split(" ");
-
+		
 		String str = "";
 		for (int i = 0; i < stringToProcess2.length; i++) {
 			if(Utilities.isLogic(stringToProcess2[i])) {
