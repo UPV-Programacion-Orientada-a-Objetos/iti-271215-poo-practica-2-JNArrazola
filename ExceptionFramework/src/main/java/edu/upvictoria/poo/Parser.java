@@ -22,6 +22,7 @@ import java.util.HashSet;
 public class Parser {
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
     public static boolean flag = false;
+
     /**
      * Function to parse the query, and start dividing it to see what type it is and
      * filter if there's a typo
@@ -29,13 +30,13 @@ public class Parser {
     public static String parseQuery(String query) throws Exception {
         query = query.trim();
 
-        if(!flag) {
+        if (!flag) {
             FileManagement.initialValidations();
             flag = true;
         }
         String brokeStr[] = query.split(" ");
 
-        if(!parenthesisCheck(query))
+        if (!parenthesisCheck(query))
             throw new IllegalArgumentException("Parentesis mal colocados");
 
         try {
@@ -153,12 +154,13 @@ public class Parser {
                 boolean canBeNull = true, isPk = false;
 
                 String[] individualArgumentBreak = s.split(" ");
-                for(int i = 0; i < individualArgumentBreak.length; i++)
+                for (int i = 0; i < individualArgumentBreak.length; i++)
                     individualArgumentBreak[i] = individualArgumentBreak[i].trim();
-                
-                for(int i = 1; i < individualArgumentBreak.length; i++)
-                    if(!Utilities.isValidReservedWordCreateTable(individualArgumentBreak[i]))
-                        throw new IllegalArgumentException(individualArgumentBreak[i] + " no es una palabra reservada válida");
+
+                for (int i = 1; i < individualArgumentBreak.length; i++)
+                    if (!Utilities.isValidReservedWordCreateTable(individualArgumentBreak[i]))
+                        throw new IllegalArgumentException(
+                                individualArgumentBreak[i] + " no es una palabra reservada válida");
 
                 // Check for name
                 String columnName = individualArgumentBreak[0];
@@ -213,7 +215,6 @@ public class Parser {
                         hasPK = true;
                         isPk = true;
                     }
-                
 
                 assignedColumnNames.add(columnName.trim());
                 typesOfTable.add(new TypeBuilder(columnName.trim(), canBeNull,
@@ -410,7 +411,8 @@ public class Parser {
                 String[] brkLine = line.split(",");
 
                 if (brkLine[index].equalsIgnoreCase(value))
-                    throw new IllegalArgumentException("La primary key se repetiría, lo que compromete la integridad de la base de datos");
+                    throw new IllegalArgumentException(
+                            "La primary key se repetiría, lo que compromete la integridad de la base de datos");
 
             }
 
@@ -461,71 +463,113 @@ public class Parser {
                     throw new Exception("Mayor longitud en " + value);
                 return true;
             case "date":
-                if(value.charAt(0)!='\'' || value.charAt(value.length()-1)!='\'')
-                    throw new NumberFormatException("Faltan comillas simples en "+ value);
+                if (value.charAt(0) != '\'' || value.charAt(value.length() - 1) != '\'')
+                    throw new NumberFormatException("Faltan comillas simples en " + value);
                 return true;
         }
 
         return false;
     }
 
-    
-
     public static String deleteFrom(String query) throws Exception {
         if (FileManagement.getDatabasePath() == null)
             throw new FileNotFoundException("No se ha accedido a ninguna base de datos");
 
+        // Delete from testTable where id = 1
+
+        query = query.replace(" DIV ", "#");
+        query = query.replace(" div ", "#");
+        query = query.replace(" MOD ", "%");
+        query = query.replace(" mod ", "%");
+
         String[] words = query.split(" ");
 
-        if (words.length < 3)
-            throw new Exception("Sintaxis incorrecta");
+        String tableName = "";
 
-        String tableName = words[2];
+        try {
+            tableName = words[2];
+        } catch (Exception e) {
+            throw new Exception("No se encontró el nombre de la tabla");
+        }
 
         if (!FileManagement.searchForTable(tableName))
-            throw new Exception("No se ha encontrado el archivo;");
+            throw new FileNotFoundException("No se encontró la tabla: " + tableName);
 
-        String condicionales = "";
-        if (query.contains("WHERE") || query.contains("where")) {
-            for (int i = 3; i < words.length; i++) {
-                if (Utilities.isReservedWord(words[i]))
+        String conditionals = "";
+
+        if (words.length > 3) {
+            if (words[3].equalsIgnoreCase("WHERE"))
+                for (int i = 4; i < words.length; i++)
+                    conditionals += words[i] + " ";
+            else 
+                throw new IllegalArgumentException("No se reconoce el comando: " + words[3]);
+            
+            if (conditionals.isEmpty())
+                throw new IllegalArgumentException("Error: WHERE vacío");
+        }
+
+        ArrayList<String> table = Utilities.getTable(tableName);
+
+        // ! Headers
+        String headerOfTable = Utilities.getHeaderOfTable(tableName);
+        ArrayList<Header> headers = new ArrayList<>();
+
+        String[] headerParts = headerOfTable.split(",");
+        for (int i = 0; i < headerParts.length; i++)
+            headers.add(new Header(headerParts[i], i));
+
+        // ? Here i have the sorted headers, to replace them in the query
+        headers.sort((h1, h2) -> h2.getName().length() - h1.getName().length());
+        // ! End of headers
+
+        ArrayList<String> finalTable = new ArrayList<>();
+
+        finalTable.add(table.get(0));
+
+        for (int i = 1; i < table.size(); i++) {
+            String[] lineBrk = table.get(i).split(",");
+            try {
+                if (Where.newWhere(conditionals, headers, lineBrk, table, ""))
                     continue;
-                condicionales += words[i] + " ";
+                finalTable.add(table.get(i));
+            } catch (Exception e) {
+                return "Error en la consulta WHERE";
             }
         }
 
-        ArrayList<String> lines = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(
-                new FileReader(FileManagement.getDatabasePath() + tableName + ".csv"))) {
-            String line;
-            lines.add(line = br.readLine());
-            while ((line = br.readLine()) != null) {
-                if (!Where.manageWhere(condicionales, line, tableName))
-                    lines.add(line);
-            }
-        } catch (IOException e) {
-            throw new IOException("No se pudo abrir el archivo");
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
-        } catch (Exception e) {
-            throw new Exception("Error de sintaxis");
+        System.out.println("Este será el resultado: ");
+        System.out.println();
+
+        for (int i = 0; i < finalTable.size(); i++) {
+            String[] lineBrk = finalTable.get(i).split(",");
+            for (int j = 0; j < lineBrk.length; j++)
+                System.out.print(lineBrk[j] + " ");
+            System.out.println();
         }
 
-        try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(FileManagement.getDatabasePath() + tableName + ".csv"))) {
-            for (String line : lines) {
-                bw.write(line);
-                bw.newLine();
+        System.out.println("¿Desea guardar los cambios? (y/n)");
+
+        String answ = bf.readLine();
+
+        if (answ.equalsIgnoreCase("y")) {
+            try (BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(FileManagement.getDatabasePath() + tableName + ".csv"))) {
+                for (String line : finalTable) {
+                    bw.write(line);
+                    bw.newLine();
+                }
+            } catch (IOException e) {
+                throw new IOException("No se pudo abrir el archivo");
             }
-        } catch (IOException e) {
-            throw new IOException("No se pudo abrir el archivo");
+        } else {
+            return "Delete cancelado";
         }
 
         return "Delete realizado con éxito";
     }
 
     public static String update(String query) throws Exception {
-        if(FileManagement.getDatabasePath() == null)
+        if (FileManagement.getDatabasePath() == null)
             throw new FileNotFoundException("No se ha accedido a ninguna base de datos");
 
         query = query.replace(" DIV ", "#");
@@ -537,13 +581,13 @@ public class Parser {
 
         String tableName = "";
 
-        try{
+        try {
             tableName = words[1];
         } catch (Exception e) {
             throw new Exception("No se encontró el nombre de la tabla");
         }
 
-        if(!FileManagement.searchForTable(tableName))
+        if (!FileManagement.searchForTable(tableName))
             throw new FileNotFoundException("No se encontró la tabla: " + tableName);
 
         String set = "", conditionals = "";
@@ -563,19 +607,17 @@ public class Parser {
             }
             set += words[i] + " ";
         }
-        
-        if(set.isEmpty())
+
+        if (set.isEmpty())
             throw new IllegalArgumentException("No se encontraron valores en el set");
-        
-        if(index != -1){
+
+        if (index != -1) {
             for (int i = index + 1; i < words.length; i++)
                 conditionals += words[i] + " ";
-            if(conditionals.isEmpty())
+            if (conditionals.isEmpty())
                 throw new IllegalArgumentException("Error: WHERE vacío");
         }
-        
-        
-        
+
         ArrayList<String> table = Utilities.getTable(tableName);
 
         // ! Headers
@@ -585,7 +627,7 @@ public class Parser {
         String[] headerParts = headerOfTable.split(",");
         for (int i = 0; i < headerParts.length; i++)
             headers.add(new Header(headerParts[i], i));
-        
+
         // ? Here i have the sorted headers, to replace them in the query
         headers.sort((h1, h2) -> h2.getName().length() - h1.getName().length());
         // ! End of headers
@@ -600,26 +642,26 @@ public class Parser {
         for (int i = 0; i < workedSet.length; i++) {
             String[] parts = workedSet[i].split("=");
 
-            if(parts.length != 2)
+            if (parts.length != 2)
                 throw new IllegalArgumentException("Error en el set: " + workedSet[i]);
-            
+
             parts[0] = parts[0].trim();
             parts[1] = parts[1].trim();
 
-            if(parts[1].isEmpty()||parts[0].isEmpty())
+            if (parts[1].isEmpty() || parts[0].isEmpty())
                 throw new IllegalArgumentException("Error en el set: " + workedSet[i]);
 
             boolean flag = false;
             for (int j = 0; j < headers.size(); j++) {
                 if (parts[0].equalsIgnoreCase(headers.get(j).getName())) {
-                    
+
                     parts[0] = Integer.toString(headers.get(j).getIndex());
-                    
-                    if(setValues.containsKey(parts[0]))
+
+                    if (setValues.containsKey(parts[0]))
                         throw new IllegalArgumentException("Columna repetida en el set: " + parts[0]);
 
                     setValues.put(parts[0], parts[1]);
-                    
+
                     flag = true;
                     break;
                 }
@@ -635,26 +677,26 @@ public class Parser {
         for (int i = 1; i < table.size(); i++) {
             String[] lineBrk = table.get(i).split(",");
             String formedString = "";
-            
+
             try {
-                if(Where.newWhere(conditionals, headers, lineBrk, table, "")){
-                    for(int j = 0; j < lineBrk.length; j++){
-                        if(setValues.containsKey(Integer.toString(j))){
+                if (Where.newWhere(conditionals, headers, lineBrk, table, "")) {
+                    for (int j = 0; j < lineBrk.length; j++) {
+                        if (setValues.containsKey(Integer.toString(j))) {
                             String result = Eval.eval(setValues.get(Integer.toString(j)), headers, lineBrk, finalTable);
                             result = result.trim();
-    
+
                             String columnName = "";
-                            for(Header h : headers)
-                                if(h.getIndex() == j)
+                            for (Header h : headers)
+                                if (h.getIndex() == j)
                                     columnName = h.getName();
-                            
+
                             String type = Utilities.getType(columnName, tableName);
-                            
-                            if(result.equalsIgnoreCase("null")){
+
+                            if (result.equalsIgnoreCase("null")) {
                                 formedString += "null,";
                                 continue;
                             }
-    
+
                             switch (type) {
                                 case "int":
                                     try {
@@ -689,60 +731,58 @@ public class Parser {
                                     }
                                     break;
                                 case "varchar":
-                                    if(result.charAt(0) != '\'' || result.charAt(result.length() - 1) != '\'')
+                                    if (result.charAt(0) != '\'' || result.charAt(result.length() - 1) != '\'')
                                         throw new NumberFormatException("Faltan comillas simples en " + result);
                                     formedString += result + ",";
                                     break;
                                 case "date":
-                                    if(result.charAt(0) != '\'' || result.charAt(result.length() - 1) != '\'')
+                                    if (result.charAt(0) != '\'' || result.charAt(result.length() - 1) != '\'')
                                         throw new NumberFormatException("Faltan comillas simples en " + result);
                                     formedString += result + ",";
                                     break;
                                 default:
                                     break;
                             }
-                            
-                        }
-                        else
+
+                        } else
                             formedString += lineBrk[j] + ",";
                     }
                     formedString = formedString.substring(0, formedString.length() - 1);
                     finalTable.add(formedString);
-                } else 
+                } else
                     finalTable.add(table.get(i));
             } catch (Exception e) {
                 return "Error en la consulta WHERE";
-            } 
+            }
         }
 
         ArrayList<TypeBuilder> types = FileManagement.decompressInfo(tableName);
 
         int indexPK = -1;
 
-        for(int i = 0; i < types.size(); i++)
-            if(types.get(i).isPrimaryKey())
+        for (int i = 0; i < types.size(); i++)
+            if (types.get(i).isPrimaryKey())
                 indexPK = i;
-        
 
-        if(indexPK == -1)
+        if (indexPK == -1)
             throw new IllegalArgumentException("No se encontró la PK");
 
         HashSet<String> pkValues = new HashSet<>();
 
-        for(int i = 1; i < finalTable.size(); i++){
+        for (int i = 1; i < finalTable.size(); i++) {
             String[] lineBrk = finalTable.get(i).split(",");
-            if(pkValues.contains(lineBrk[indexPK]))
-                throw new IllegalArgumentException("La PK se repetiría, lo que compromete la integridad de la base de datos");
+            if (pkValues.contains(lineBrk[indexPK]))
+                throw new IllegalArgumentException(
+                        "La PK se repetiría, lo que compromete la integridad de la base de datos");
             pkValues.add(lineBrk[indexPK]);
         }
-
 
         System.out.println("Este será el resultado: ");
         System.out.println();
 
-        for(int i = 0; i < finalTable.size(); i++){
+        for (int i = 0; i < finalTable.size(); i++) {
             String[] lineBrk = finalTable.get(i).split(",");
-            for(int j = 0; j < lineBrk.length; j++)
+            for (int j = 0; j < lineBrk.length; j++)
                 System.out.print(lineBrk[j] + " ");
             System.out.println();
         }
@@ -750,8 +790,9 @@ public class Parser {
         System.out.println("¿Desea guardar los cambios? (y/n)");
         String answ = bf.readLine();
 
-        if(answ.equalsIgnoreCase("y")){
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(FileManagement.getDatabasePath() + tableName + ".csv"))) {
+        if (answ.equalsIgnoreCase("y")) {
+            try (BufferedWriter bw = new BufferedWriter(
+                    new FileWriter(FileManagement.getDatabasePath() + tableName + ".csv"))) {
                 for (String line : finalTable) {
                     bw.write(line);
                     bw.newLine();
