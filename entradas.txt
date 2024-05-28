@@ -1,62 +1,27 @@
------------------------------- ENTRAR A LA BASE DE DATOS DE PRUEBA ------------------------------
-use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test;
-(Reemplazar "/home/jarrazola/Documents" por el path relativo)
+----------------- ENTRAR A LA BASE DE DATOS ----------------------------
+USE /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test;
+* Reemplazar path relativo * 
 
------------------------------- SELECCIONAR COSAS ------------------------------
-SELECT * FROM testTable;
-select * from testTable where id = 1 or id = 2;
-SELECT * FROM testTable where id = 1 or name = 'said';
+----------------- Seleccionar datos ----------------------------
+select id + 2 / 2 from test;
 
------------------------------- PRUEBA DE CÁLCULOS ARITMÉTICOS -------------------------
-SELECT 2+2 AS 'CALCULO';
-SELECT 2+2/2;
-SELECT FLOOR(2+3/2);
-SELECT CEIL(2+3/2) AS 'CEIL FUNCTION';
+select ceil(id + 2 + round(money / 500)) as 'operacion compleja' from test;
 
-* EJEMPLOS DEL README: 
-    SELECT 23 * 6 AS 'multiplication_result';
-    SALIDA ESPERADA: multiplication_result
-                     138
-    
-    SELECT 23 + 6;
-    SALIDA ESPERADA: 29
+select id + count(*) from test;     
 
-    SELECT 23 MOD 6;
-    SALIDA ESPERADA: 5
+select count(*) from test;
 
-    SELECT FLOOR (23/6) AS 'floor_result';
-    SALIDA ESPERADA: 3
+select ucase(name) as 'mayusculas', lcase(name) as 'minusculas', capitalize(name) as 'capitalizadas' from test;
 
-    SELECT RAND() AS 'random_result';
-    RESULTADO ESPERADO: cualquier número random
+select * from test where id < 20 and (name = 'dariana' or name = 'mariana');
 
------------------------------- FUNCIONES AGREGADAS ------------------------------
-* EJEMPLOS DEL README 
-    SELECT COUNT(movie_id) FROM movierentals WHERE movie_id = 2;
-    SALIDA ESPERADA: 3
+select * from test where ucase(name) = 'MARIO';
 
-    SELECT DISTINCT movie_id FROM movierentals;
-    SALIDA ESPERADA: 1 
-                     2 
-                     3
+select * from test where money > avg(money);
 
-// SELECT PARA VISUALIZAR LOS DATOS PRIMERO
-SELECT * FROM testTable;
+select round(id + money + 1000 + round(id + 1 + floor(1.5))) from test;
+----------------- Update -----------------------
+update test set id = id + money where id < 10 and (name = 'jess' or name = 'joshua');
 
-SELECT MIN(money) from testTable;
-SALIDA ESPERADA: 1000
-
-SELECT MAX(money) as 'maximo' FROM testTable;
-SALIDA ESPERADA: 3500
-
-* EJEMPLOS DEL README
-    SELECT SUM(cantidad) FROM payments;
-    SALIDA ESPERADA: 10500
-
-    SELECT AVG(cantidad) FROM payments;
-    SALIDA ESPERADA: 3500
-
------------------------------- FUNCIONES DE CADENA ------------------------------
-select ucase(name), height from testTable where id <= 3;
-select capitalize(name) from testTable;
-select ucase(name), capitalize(name) as 'mayusculas' from testTable;
+---------------- Delete --------------------------
+delete from test where id + 2 < 10;

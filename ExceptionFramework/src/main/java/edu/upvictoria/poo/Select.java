@@ -50,7 +50,7 @@ public class Select {
                 if (queryBrk[index + 1].equalsIgnoreCase("WHERE"))
                     for (int i = index + 2; i < queryBrk.length; i++)
                         conditionals += queryBrk[i] + " ";
-                else 
+                else
                     throw new IllegalArgumentException("No se reconoce el comando: " + queryBrk[index + 1]);
                 conditionals = conditionals.trim();
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -108,11 +108,16 @@ public class Select {
         ArrayList<String> resultTable = new ArrayList<>();
         ArrayList<String> table = Utilities.getTable(tableName);
 
-        for (int i = 1; i < table.size(); i++) {
-            String[] lineBrk = table.get(i).split(",");
-            if (Where.newWhere(conditionals, headers, lineBrk, table, ""))
-                resultTable.add(table.get(i));
+        try{
+            for (int i = 1; i < table.size(); i++) {
+                String[] lineBrk = table.get(i).split(",");
+                if (Where.newWhere(conditionals, headers, lineBrk, table, ""))
+                    resultTable.add(table.get(i));
+            }
+        } catch(Error e){
+            throw new IllegalArgumentException("Error en la sentencia WHERE");
         }
+        
 
         if (argsBreak[0].equals("*")) {
             if (argsBreak.length != 1)
@@ -144,19 +149,23 @@ public class Select {
             header = header.substring(0, header.length() - 1);
         finaltable.add(header);
 
-        // ! First i iterate through the result table
-        for (int i = 0; i < resultTable.size(); i++) {
-            String[] lineBrk = resultTable.get(i).split(",");
-            String line = "";
+        try {
+            // ! First i iterate through the result table
+            for (int i = 0; i < resultTable.size(); i++) {
+                String[] lineBrk = resultTable.get(i).split(",");
+                String line = "";
 
-            // ! Then i iterate through the args
-            for (int j = 0; j < argsBreak.length; j++) {
-                String arg = argsBreak[j];
-                line += Eval.eval(arg, headers, lineBrk, resultTable) + ",";
+                // ! Then i iterate through the args
+                for (int j = 0; j < argsBreak.length; j++) {
+                    String arg = argsBreak[j];
+                    line += Eval.eval(arg, headers, lineBrk, resultTable) + ",";
+                }
+                if (line.endsWith(","))
+                    line = line.substring(0, line.length() - 1);
+                finaltable.add(line);
             }
-            if (line.endsWith(","))
-                line = line.substring(0, line.length() - 1);
-            finaltable.add(line);
+        } catch (Error e) {
+            throw new IllegalArgumentException("Error en función de evaluación");
         }
 
         for (int i = 0; i < finaltable.size(); i++)

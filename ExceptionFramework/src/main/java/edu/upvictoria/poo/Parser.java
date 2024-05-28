@@ -316,7 +316,16 @@ public class Parser {
             throw new IndexOutOfBoundsException("Faltaron valores en el insert into");
         }
 
-        String values = parts[5];
+        String values = "";
+
+        try {
+            values = parts[5];
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException("Faltaron valores en el insert into");
+        }
+
+        if (values.isEmpty())
+            throw new IllegalArgumentException("No se encontraron valores en el insert into");
 
         String[] colBrk = columns.split(",");
         String[] valBrk = values.split(",");
@@ -515,9 +524,9 @@ public class Parser {
             if (words[3].equalsIgnoreCase("WHERE"))
                 for (int i = 4; i < words.length; i++)
                     conditionals += words[i] + " ";
-            else 
+            else
                 throw new IllegalArgumentException("No se reconoce el comando: " + words[3]);
-            
+
             if (conditionals.isEmpty())
                 throw new IllegalArgumentException("Error: WHERE vacío");
         }
@@ -547,6 +556,8 @@ public class Parser {
                     continue;
                 finalTable.add(table.get(i));
             } catch (Exception e) {
+                return "Error en la consulta WHERE";
+            } catch (Error e) {
                 return "Error en la consulta WHERE";
             }
         }
@@ -658,7 +669,7 @@ public class Parser {
 
             if (parts.length != 2)
                 throw new IllegalArgumentException("Error en el set: " + workedSet[i]);
-
+            
             parts[0] = parts[0].trim();
             parts[1] = parts[1].trim();
 
@@ -672,7 +683,7 @@ public class Parser {
                     parts[0] = Integer.toString(headers.get(j).getIndex());
 
                     if (setValues.containsKey(parts[0]))
-                        throw new IllegalArgumentException("Columna repetida en el set: " + parts[0]);
+                        throw new IllegalArgumentException("Columna repetida en el set");
 
                     setValues.put(parts[0], parts[1]);
 
@@ -766,6 +777,8 @@ public class Parser {
                 } else
                     finalTable.add(table.get(i));
             } catch (Exception e) {
+                return "Error en la consulta WHERE";
+            } catch (Error e) {
                 return "Error en la consulta WHERE";
             }
         }

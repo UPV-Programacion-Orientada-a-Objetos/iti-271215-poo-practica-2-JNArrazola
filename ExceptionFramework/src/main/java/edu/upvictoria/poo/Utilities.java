@@ -23,6 +23,7 @@ public class Utilities {
     private static final ArrayList<String> aggregateFunctions = new ArrayList<>();
     private static final ArrayList<String> validReservedWordsCreateTable = new ArrayList<>();
     private static final ArrayList<String> colFunctions = new ArrayList<>();
+    public static final Set<String> isValidInEval = new HashSet<>();
 
     private static final BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
 
@@ -294,7 +295,7 @@ public class Utilities {
                 table.add(line);
             }
         } catch (Exception e) {
-            System.out.println("No se pudo abrir el archivo");
+            System.out.println("No se pudo abrir el archivo: " + tableName + ".csv");
         }
 
         return table;

@@ -266,9 +266,14 @@ public class Eval {
         for (int k = 0; k < headers.size(); k++) 
             expressionToEvaluate = expressionToEvaluate.replace(headers.get(k).getName(), lineBreak[headers.get(k).getIndex()]);
 
+        if(!verifySentence(expressionToEvaluate))
+            throw new IllegalArgumentException("Error en la sentencia: " + expressionToEvaluate);
+
         return EvaluateExpression.evaluateExpression(expressionToEvaluate);
     }
 
+
+    // -----------------  UTILS  -----------------
 
     public static boolean hasValidParenthesis(String arg){
         int ctr = 0;
@@ -287,6 +292,48 @@ public class Eval {
         return c == '+' || c == '-' || c == '*' || c == '/' || c == '%' || c == '#';
     }
 
+    public static boolean isSign(String c){
+        return c.equals("+") || c.equals("-") || c.equals("*") || c.equals("/") || c.equals("%") || c.equals("#");
+    }
+
+    public static boolean verifySentence(String arg){
+        String workedString = "";
+
+        for (int i = 0; i < arg.length(); i++) {
+            if(arg.charAt(i) == '(' || arg.charAt(i) == ')')
+                continue;
+
+            if(isSign(arg.charAt(i))) {
+                workedString+=" ";
+                workedString+=arg.charAt(i);
+                workedString+=" ";
+                continue;
+            } 
+            
+            workedString+=arg.charAt(i);
+        }
+
+        String[] workedStringBreak = workedString.split(" ");
+
+        for(int i = 0; i < workedStringBreak.length; i++){
+            if(isSign(workedStringBreak[i]))
+                continue;
+            
+            if(workedStringBreak[i].startsWith("'") && workedStringBreak[i].endsWith("'"))
+                continue;
+            
+            if(workedStringBreak[i].equalsIgnoreCase("NULL"))
+                continue;
+
+            try {
+                Double.parseDouble(workedStringBreak[i]);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Error en la evaluación: No se reconoció '" + workedStringBreak[i]+"'");
+            }
+        }
+        
+        return true;
+    }
 
     // -----------------  FUNCTIONS  -----------------
 
@@ -298,10 +345,13 @@ public class Eval {
         
         numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
 
+        if(numberToEvaluate.isEmpty()||numberToEvaluate.equalsIgnoreCase("null"))
+            return "null";
+
         try {
             Double.parseDouble(numberToEvaluate);
         } catch (Exception e) {
-            return "null";
+            throw new IllegalArgumentException("Error en la sentencia ROUND: " + numberToEvaluate + " no es un número");
         }
 
         return Double.toString(Math.round(Double.parseDouble(numberToEvaluate)));
@@ -315,6 +365,9 @@ public class Eval {
         
         numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
         
+        if(numberToEvaluate.isEmpty()||numberToEvaluate.equalsIgnoreCase("null"))
+            return "null";
+
         return Double.toString(Math.floor(Double.parseDouble(numberToEvaluate)));
     }
 
@@ -326,10 +379,13 @@ public class Eval {
         
         numberToEvaluate = eval(numberToEvaluate, headers, lineBreak, table);
         
+        if(numberToEvaluate.isEmpty()||numberToEvaluate.equalsIgnoreCase("null"))
+            return "null";
+
         try {
             Double.parseDouble(numberToEvaluate);
         } catch (Exception e) {
-            return "null";
+            throw new IllegalArgumentException("Error en la sentencia CEIL: " + numberToEvaluate + " no es un número");
         }
 
         return Double.toString(Math.ceil(Double.parseDouble(numberToEvaluate)));
@@ -444,9 +500,6 @@ public class Eval {
 
     // -----------------  Group Functions  -----------------
     public static String COUNT(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
-        if(table.size() == 1)
-            return "0";
-        
         if(!arg.contains("(")||!arg.contains(")"))
             throw new IllegalArgumentException("Error en los paréntesis en la sentencia COUNT");
 
@@ -456,7 +509,7 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función COUNT: No se especificó la columna");
 
         if(column.equals("*"))
-            return Integer.toString(table.size() - 1); // ! -1 because of the header (first line)
+            return Integer.toString(table.size()); 
 
         int indexOfColumn = -1;
         for (int i = 0; i < headers.size(); i++) 

@@ -310,8 +310,6 @@ public class Where {
 				actualString = "";
 			} 
 		}
-		
-
 		Queue<String> operators = new LinkedList<String>();
 		Queue<String> conditionals = new LinkedList<String>();
 
@@ -335,6 +333,7 @@ public class Where {
 		return evalFunction(headers, lineBreak, table, operators, conditionals);
 	}
 
+	@SuppressWarnings("unused")
 	public static boolean evalFunction(ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table, Queue<String> operators, Queue<String> conditionals) throws Exception {
 		String comparator = "";
 
@@ -397,6 +396,10 @@ public class Where {
 			String operatorStr = operators.poll();
 			if(operatorStr.equalsIgnoreCase("OR"))
 				return false || evalFunction(headers, lineBreak, table, operators, conditionals);
+			else if(operatorStr.equalsIgnoreCase("AND"))
+				return false && evalFunction(headers, lineBreak, table, operators, conditionals);
+			else 
+				throw new IllegalArgumentException("Error en la sentencia WHERE: " + conditional + comparator);
 		}
 
 		boolean resultBoolean = false;
