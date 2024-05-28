@@ -15,6 +15,9 @@ import java.util.HashMap;
  */
 public class Select {
     public static String select(String query) throws Exception {
+        if(query.isEmpty())
+            throw new IllegalArgumentException("Query vacía");
+        
         query = query.replace(" DIV ", "#");
         query = query.replace(" div ", "#");
         query = query.replace(" MOD ", "%");
@@ -57,6 +60,10 @@ public class Select {
                 throw new IllegalArgumentException("WHERE vacío");
             }
         }
+
+        if(query.contains("where")||query.contains("WHERE"))
+            if(conditionals.equals(""))
+                throw new IllegalArgumentException("WHERE vacío");
 
         if (!FileManagement.searchForTable(tableName))
             throw new FileNotFoundException("No se encontró la tabla: " + tableName);

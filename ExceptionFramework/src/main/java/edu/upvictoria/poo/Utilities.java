@@ -76,6 +76,30 @@ public class Utilities {
         reservedWords.add("AVG");
         reservedWords.add("MAX");
         reservedWords.add("MIN");
+        reservedWords.add("FLOOR");
+        reservedWords.add("CEIL");
+        reservedWords.add("UCASE");
+        reservedWords.add("LCASE");
+        reservedWords.add("CAPITALIZE");
+        reservedWords.add("AND");
+        reservedWords.add("OR");
+        reservedWords.add("!=");
+        reservedWords.add("<=");
+        reservedWords.add(">=");
+        reservedWords.add("=");
+        reservedWords.add("<");
+        reservedWords.add(">");
+        reservedWords.add("<>");
+        reservedWords.add("SUM");
+        reservedWords.add("RAND");
+        reservedWords.add("ROUND");
+        reservedWords.add("DISTINCT");
+        reservedWords.add("CREATE");
+        reservedWords.add("TABLE");
+        reservedWords.add("DROP");
+        reservedWords.add("DATABASE");
+        reservedWords.add("ALTER");
+        reservedWords.add("ADD");
     }
 
     public static void fillLogicOperators(){
@@ -299,5 +323,13 @@ public class Utilities {
         }
 
         return table;
+    }
+
+    public static void handleException(Exception e){
+        if(e.getMessage().toUpperCase().contains("out of bounds".toUpperCase()))
+            throw new IndexOutOfBoundsException("Error en la sentencia: Sintaxis inválida");
+
+        if(e.getMessage().toUpperCase().contains("begin".toUpperCase()))
+            throw new IllegalArgumentException("Error en la sentencia: Sintaxis inválida");
     }
 }

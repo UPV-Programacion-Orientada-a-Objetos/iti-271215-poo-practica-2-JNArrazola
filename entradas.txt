@@ -20,8 +20,24 @@ select * from test where ucase(name) = 'MARIO';
 select * from test where money > avg(money);
 
 select round(id + money + 1000 + round(id + 1 + floor(1.5))) from test;
+
+SELECT * FROM test WHERE id+1=(2+3)+1*2;
 ----------------- Update -----------------------
 update test set id = id + money where id < 10 and (name = 'jess' or name = 'joshua');
 
+update test set money = money + 1000 where round(id / 10) >= 1;
 ---------------- Delete --------------------------
 delete from test where id + 2 < 10;
+
+
+--------------- Crear tabla ----------------------
+create table employees(id int primary key, str varchar(20), age int, money double);
+
+--------------- Insert into ---------------------
+insert into employees (id,str,age,money) values (1,'pedro',12,200.12);
+insert into employees (id,str,age,money) values (2,'miguel',16,141.23);
+insert into employees (id,str,age,money) values (3,'jose',12,3541.34);
+insert into employees (id,str,age,money) values (4,'ignacio',12,2112.56);
+
+--------------- Select .........................
+select str, max(age) from employees where str = 'pedro' or (str = 'miguel' and money = 141.23);

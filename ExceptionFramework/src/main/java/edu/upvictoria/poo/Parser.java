@@ -60,8 +60,9 @@ public class Parser {
                 return dropTable(query, brokeStr);
             }
         } catch (Exception e) {
+            Utilities.handleException(e);
             throw new Exception(e.getMessage());
-        }
+        } catch (Error e) {}
 
         return "No se reconoció la sentencia";
     }
@@ -185,8 +186,14 @@ public class Parser {
 
                 // Check for length
                 // also check if the length is invalid
-                if (type.contains("("))
-                    length = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
+                if (type.contains("(")){
+                    if(type.contains(")"))
+                        length = type.substring(type.indexOf("(") + 1, type.indexOf(")"));
+                    else
+                        throw new IllegalArgumentException("Falta cerrar el paréntesis");
+                    if(length.equals(""))
+                        throw new IllegalArgumentException("Longitud inválida");
+                }
                 if (!(length.equalsIgnoreCase(""))
                         && (type.toLowerCase().contains("int") || type.toLowerCase().contains("date")))
                     throw new IllegalArgumentException("INT y DATE no pueden tener precisión");
