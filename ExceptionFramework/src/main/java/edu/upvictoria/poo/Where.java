@@ -90,7 +90,6 @@ public class Where {
 		return evalFunction(headers, lineBreak, table, operators, conditionals);
 	}
 
-	@SuppressWarnings("unused")
 	public static boolean evalFunction(ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table, Queue<String> operators, Queue<String> conditionals) throws Exception {
 		String comparator = "";
 
@@ -146,19 +145,6 @@ public class Where {
 		String firstPart = Eval.eval(parts[0].trim(), headers, lineBreak, table);
 		String secondPart = Eval.eval(parts[1].trim(), headers, lineBreak, table);
 
-		// ? Handle the case when one of the parts is NULL
-		if(firstPart.equalsIgnoreCase("NULL")||secondPart.equalsIgnoreCase("NULL")){
-			if(operators.isEmpty())
-				return false;
-			String operatorStr = operators.poll();
-			if(operatorStr.equalsIgnoreCase("OR"))
-				return false || evalFunction(headers, lineBreak, table, operators, conditionals);
-			else if(operatorStr.equalsIgnoreCase("AND"))
-				return false && evalFunction(headers, lineBreak, table, operators, conditionals);
-			else 
-				throw new IllegalArgumentException("Error en la sentencia WHERE: " + conditional + comparator);
-		}
-
 		boolean resultBoolean = false;
 		switch (comparator) {
 			case "=":
@@ -179,6 +165,8 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) <= Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
+					if(firstPart.equals("null")||secondPart.equals("null"))
+						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) <= 0;
 				}
 				break;
@@ -186,6 +174,8 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) >= Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
+					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
+						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) >= 0;
 				}
 				break;
@@ -193,6 +183,9 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) < Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
+					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
+						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
+
 					resultBoolean = firstPart.compareTo(secondPart) < 0;
 				}
 				break;
@@ -200,6 +193,8 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) > Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
+					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
+						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) > 0;
 				}
 				break;
@@ -208,11 +203,17 @@ public class Where {
 					resultBoolean = Double.parseDouble(firstPart) != Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
 					resultBoolean = !firstPart.equals(secondPart);
+					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
+						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 				}
 				break;
 			default:
 				break;
 		}
+
+		if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
+			if(!comparator.equalsIgnoreCase("=")&&!comparator.equalsIgnoreCase("!="))
+				resultBoolean = false;
 
 		if(operators.isEmpty())
 			return resultBoolean;

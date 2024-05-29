@@ -166,7 +166,7 @@ public class AppTest
             Parser.parseQuery(query);
         });
 
-        assertEquals("pedro no es una palabra reservada válida", generatedException.getMessage());
+        assertEquals("El nombre no puede ser una palabra reservada", generatedException.getMessage());
         new File(new File("").getAbsolutePath() + "/JOSHUA.csv").delete();
         new File(new File("").getAbsolutePath() + "/JOSHUA_aux.txt").delete();
     }
@@ -182,7 +182,7 @@ public class AppTest
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select name as 'nombre', id as apellido from testTables;");
         });
-        assertEquals("Alias incorrectos", e.getMessage());
+        assertEquals("No se encontró la tabla: testTables;", e.getMessage());
     }
 
     /**
@@ -192,9 +192,9 @@ public class AppTest
     public void testArguments(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("select id, a from testTable");
+            Parser.parseQuery("select id, a from test");
         });
-        assertEquals("Parámetros desconocidos en el select: a", e.getMessage());
+        assertEquals("Error en la evaluación: No se reconoció 'a'", e.getMessage());
     }
 
     @Test 
@@ -203,7 +203,7 @@ public class AppTest
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select * from a");
         });
-        assertEquals("Tabla no encontrada", e.getMessage());
+        assertEquals("No se encontró la tabla: a", e.getMessage());
     }
 
     /**
@@ -236,7 +236,7 @@ public class AppTest
             Parser.parseQuery(query);
         });
 
-        assertEquals("Tabla no encontrada", generatedException.getMessage());
+        assertEquals("No se encontró la tabla: JOSHUA", generatedException.getMessage());
     }
 
     // ---------------------------------------------- DELETE TEST ----------------------------------------------
@@ -276,10 +276,10 @@ public class AppTest
     public void testUpdateInvalid(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("update testTable set a=2, b=3 where i = 1");
+            Parser.parseQuery("update test set a=2, b=3 where i = 1");
         });
 
-        assertEquals("Set inválido", e.getMessage());
+        assertEquals(e.getMessage(), "Columna no encontrada en la tabla: a");
     }
     
     // ---------------------------------------------- INSERT TEST ----------------------------------------------
@@ -290,7 +290,7 @@ public class AppTest
     public void testInsertInvalid(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("insert into testTable (id, name) values (1, 'joshua', 2)");
+            Parser.parseQuery("insert into test (id, name) values (1, 'joshua', 2)");
         });
 
         assertEquals("Los valores a insertar y las columnas no coinciden", e.getMessage());
@@ -303,10 +303,10 @@ public class AppTest
     public void testInsertRepeatedPrimaryKey(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("insert into testTable (id, name) values (1,'jose')");
+            Parser.parseQuery("insert into test (id, name) values (1,'jose')");
         });
 
-        assertEquals("PK repetida", e.getMessage());
+        assertEquals("La primary key se repetiría, lo que compromete la integridad de la base de datos", e.getMessage());
     }
 
     /**
@@ -316,8 +316,8 @@ public class AppTest
     public void testInsertInvalidTypes(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("INSERT INTO testTable (id,name) values (15,34)");
-            Parser.parseQuery("DELETE FROM testTable WHERE values id = 15");
+            Parser.parseQuery("INSERT INTO test (id,name) values (15,34)");
+            Parser.parseQuery("DELETE FROM test WHERE values id = 15");
         });
 
         assertEquals("Faltan comillas simples en 34", e.getMessage());
@@ -330,7 +330,7 @@ public class AppTest
     public void testNullVerification(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("INSERT INTO testTable (id,height) values (15,1.20)");
+            Parser.parseQuery("INSERT INTO test (id,height) values (15,1.20)");
         });
 
         assertEquals("Hay valores nulos que no deberían de serlo", e.getMessage());
@@ -343,7 +343,7 @@ public class AppTest
     public void testPrecision(){
         Exception e = assertThrows(Exception.class, () -> {
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
-            Parser.parseQuery("INSERT INTO testTable (id,name,height) values (15,'pedro',1.2314)");
+            Parser.parseQuery("INSERT INTO test (id,name,height) values (15,'pedro',1.2314)");
         });
 
         assertEquals("Precisión equivocada", e.getMessage());

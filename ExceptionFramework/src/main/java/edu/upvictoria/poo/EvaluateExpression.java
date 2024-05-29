@@ -122,7 +122,7 @@ public class EvaluateExpression {
             List<String> postfix = infixToPostfix(expression);
             return Double.toString(evaluatePostfix(postfix));
         } catch (Exception e) {
-            throw new RuntimeException("Error al evaluar la expresión: " + e.getMessage());
+            throw new RuntimeException("Error al evaluar la expresión: " + expression);
         }
     }
 

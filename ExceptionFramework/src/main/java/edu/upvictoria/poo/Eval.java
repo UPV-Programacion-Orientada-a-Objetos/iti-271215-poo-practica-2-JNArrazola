@@ -266,8 +266,8 @@ public class Eval {
         for (int k = 0; k < headers.size(); k++) 
             expressionToEvaluate = expressionToEvaluate.replace(headers.get(k).getName(), lineBreak[headers.get(k).getIndex()]);
 
-        if(!verifySentence(expressionToEvaluate))
-            throw new IllegalArgumentException("Error en la sentencia: " + expressionToEvaluate);
+        // if(!verifySentence(expressionToEvaluate))
+        //     throw new IllegalArgumentException("Error en la sentencia: " + expressionToEvaluate);
 
         return EvaluateExpression.evaluateExpression(expressionToEvaluate);
     }
@@ -312,7 +312,7 @@ public class Eval {
             
             workedString+=arg.charAt(i);
         }
-
+        System.out.println(workedString);
         String[] workedStringBreak = workedString.split(" ");
 
         for(int i = 0; i < workedStringBreak.length; i++){
@@ -328,7 +328,7 @@ public class Eval {
             try {
                 Double.parseDouble(workedStringBreak[i]);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Error en la evaluación: No se reconoció '" + workedStringBreak[i]+"'");
+                throw new IllegalArgumentException("Error en la evaluación: No se reconoció '" + arg +"'");
             }
         }
         
@@ -520,8 +520,8 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función COUNT: No se encontró la columna " + column);
         
         int count = 0;
-        for (int i = 1; i < table.size(); i++) 
-            if(!table.get(i).split(",")[indexOfColumn].equals("null"))
+        for (int i = 0; i < table.size(); i++) 
+            if(!table.get(i).split(",")[indexOfColumn].equalsIgnoreCase("null"))
                 count++;
 
         return Integer.toString(count);
@@ -552,7 +552,7 @@ public class Eval {
         
         double sum = 0;
         int count = 0;
-        for (int i = 1; i < table.size(); i++) 
+        for (int i = 0; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null")){
 
                 try {
@@ -659,7 +659,7 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función SUM: No se encontró la columna " + column);
         
         double sum = 0;
-        for (int i = 1; i < table.size(); i++) 
+        for (int i = 0; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null")){
 
                 try {
