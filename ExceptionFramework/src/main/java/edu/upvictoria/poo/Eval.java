@@ -1,6 +1,7 @@
 package edu.upvictoria.poo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -266,8 +267,8 @@ public class Eval {
         for (int k = 0; k < headers.size(); k++) 
             expressionToEvaluate = expressionToEvaluate.replace(headers.get(k).getName(), lineBreak[headers.get(k).getIndex()]);
 
-        // if(!verifySentence(expressionToEvaluate))
-        //     throw new IllegalArgumentException("Error en la sentencia: " + expressionToEvaluate);
+        if(!verifySentence(expressionToEvaluate))
+            throw new IllegalArgumentException("Error en la sentencia: " + expressionToEvaluate);
 
         return EvaluateExpression.evaluateExpression(expressionToEvaluate);
     }
@@ -299,40 +300,13 @@ public class Eval {
     public static boolean verifySentence(String arg){
         String workedString = "";
 
-        for (int i = 0; i < arg.length(); i++) {
-            if(arg.charAt(i) == '(' || arg.charAt(i) == ')')
-                continue;
-
-            if(isSign(arg.charAt(i))) {
-                workedString+=" ";
-                workedString+=arg.charAt(i);
-                workedString+=" ";
-                continue;
-            } 
-            
-            workedString+=arg.charAt(i);
-        }
-        System.out.println(workedString);
-        String[] workedStringBreak = workedString.split(" ");
-
-        for(int i = 0; i < workedStringBreak.length; i++){
-            if(isSign(workedStringBreak[i]))
-                continue;
-            
-            if(workedStringBreak[i].startsWith("'") && workedStringBreak[i].endsWith("'"))
-                continue;
-            
-            if(workedStringBreak[i].equalsIgnoreCase("NULL"))
-                continue;
-
-            try {
-                Double.parseDouble(workedStringBreak[i]);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Error en la evaluación: No se reconoció '" + arg +"'");
-            }
-        }
         
         return true;
+    }
+
+    public static boolean isNumberOrOperator(){
+
+        return false;
     }
 
     // -----------------  FUNCTIONS  -----------------

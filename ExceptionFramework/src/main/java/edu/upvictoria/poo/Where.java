@@ -165,8 +165,6 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) <= Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
-					if(firstPart.equals("null")||secondPart.equals("null"))
-						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) <= 0;
 				}
 				break;
@@ -174,8 +172,6 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) >= Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
-					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
-						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) >= 0;
 				}
 				break;
@@ -183,9 +179,6 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) < Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
-					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
-						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
-
 					resultBoolean = firstPart.compareTo(secondPart) < 0;
 				}
 				break;
@@ -193,8 +186,6 @@ public class Where {
 				try {
 					resultBoolean = Double.parseDouble(firstPart) > Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
-					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
-						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 					resultBoolean = firstPart.compareTo(secondPart) > 0;
 				}
 				break;
@@ -203,8 +194,6 @@ public class Where {
 					resultBoolean = Double.parseDouble(firstPart) != Double.parseDouble(secondPart);
 				} catch(NumberFormatException e) {
 					resultBoolean = !firstPart.equals(secondPart);
-					if(firstPart.equalsIgnoreCase("null")||secondPart.equalsIgnoreCase("null"))
-						throw new IllegalArgumentException("No es válido usar null con un operador: " + comparator);
 				}
 				break;
 			default:
