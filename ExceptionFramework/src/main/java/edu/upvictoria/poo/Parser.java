@@ -62,7 +62,10 @@ public class Parser {
         } catch (Exception e) {
             Utilities.handleException(e);
             throw new Exception(e.getMessage());
-        } catch (Error e) {}
+        } catch (Error e) {
+            Utilities.handleError(e);
+            throw new Error(e.getMessage());
+        }
 
         return "No se reconoció la sentencia";
     }
@@ -221,6 +224,7 @@ public class Parser {
                     else {
                         hasPK = true;
                         isPk = true;
+                        canBeNull = false;
                     }
 
                 assignedColumnNames.add(columnName.trim());
@@ -787,7 +791,7 @@ public class Parser {
                 } else
                     finalTable.add(table.get(i));
             }  catch (Error e) {
-                return "Error en la consulta WHERE: " + e.getMessage();
+                throw new Error("Error en la consulta WHERE");
             }
         }
 

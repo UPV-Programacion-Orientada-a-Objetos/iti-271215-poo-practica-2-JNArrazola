@@ -1,3 +1,0 @@
-id,true,int,-1,true
-str,true,varchar,20,false
-age,true,int,-1,false

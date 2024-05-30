@@ -194,7 +194,7 @@ public class AppTest
             Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test/");
             Parser.parseQuery("select id, a from test");
         });
-        assertEquals("Error en la evaluación: No se reconoció 'a'", e.getMessage());
+        assertEquals("Error en la sentencia: a", e.getMessage());
     }
 
     @Test 
@@ -246,11 +246,11 @@ public class AppTest
     @Test
     public void testDeleteTableDoesNotExist() throws Exception {
         Exception generatedException = assertThrows(Exception.class, () -> {
-            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-1-JNArrazola/test");
+            Parser.parseQuery("use /home/jarrazola/Documents/iti-271215-poo-practica-2-JNArrazola/test");
             Parser.parseQuery("DELETE FROM tesamd WHERE id = 1;");
         });
 
-        assertEquals("El directorio no existe", generatedException.getMessage());
+        assertEquals("No se encontró la tabla: tesamd", generatedException.getMessage());
     }
 
     //---------------------------------------------- CREATE TEST ----------------------------------------------
