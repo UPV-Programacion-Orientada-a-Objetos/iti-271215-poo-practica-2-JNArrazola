@@ -717,6 +717,9 @@ public class Parser {
                             String result = Eval.eval(setValues.get(Integer.toString(j)), headers, lineBrk, finalTable);
                             result = result.trim();
 
+                            if(result.equalsIgnoreCase("NULL")&&!lineBrk[j].equalsIgnoreCase("NULL"))
+                                throw new IllegalArgumentException("No se puede asignar NULL a una columna");
+
                             String columnName = "";
                             for (Header h : headers)
                                 if (h.getIndex() == j)
@@ -783,10 +786,8 @@ public class Parser {
                     finalTable.add(formedString);
                 } else
                     finalTable.add(table.get(i));
-            } catch (Exception e) {
-                return "Error en la consulta WHERE";
-            } catch (Error e) {
-                return "Error en la consulta WHERE";
+            }  catch (Error e) {
+                return "Error en la consulta WHERE: " + e.getMessage();
             }
         }
 

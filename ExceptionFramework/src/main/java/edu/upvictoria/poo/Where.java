@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.LinkedList;
 
-
-
 public class Where {
 
 	/**
@@ -23,7 +21,8 @@ public class Where {
 	public static boolean newWhere(String condicionales, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table, String lastCall) throws Exception {
 		if (condicionales.equals(""))
 			return true;
-
+		// print linebreak
+		
 		if(condicionales.equalsIgnoreCase(lastCall))
 			throw new IllegalArgumentException("Error en la sentencia WHERE: " + condicionales);
 
@@ -138,7 +137,6 @@ public class Where {
 		}
 
 		parts = conditional.split(",");
-
 		if(parts.length != 2)
 			throw new IllegalArgumentException("Error en la sentencia WHERE: " + conditional + comparator);
 

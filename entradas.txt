@@ -22,10 +22,18 @@ select * from test where money > avg(money);
 select round(id + money + 1000 + round(id + 1 + floor(1.5))) from test;
 
 SELECT * FROM test WHERE id+1=(2+3)+1*2;
+
+select * from test where id + 10 < 20;
+
+select * from test where height + 0.4 = 2;
+
+select * from test where sum(money) < 50000;   
 ----------------- Update -----------------------
 update test set id = id + money where id < 10 and (name = 'jess' or name = 'joshua');
 
 update test set money = money + 1000 where round(id / 10) >= 1;
+
+update test set name = ucase(name);
 ---------------- Delete --------------------------
 delete from test where id + 2 < 10;
 

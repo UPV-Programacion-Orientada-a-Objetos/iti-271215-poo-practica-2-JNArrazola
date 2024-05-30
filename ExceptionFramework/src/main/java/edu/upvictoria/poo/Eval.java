@@ -1,7 +1,6 @@
 package edu.upvictoria.poo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -299,14 +298,38 @@ public class Eval {
 
     public static boolean verifySentence(String arg){
         String workedString = "";
+        for (int i = 0; i < arg.length(); i++) {
+            if(arg.charAt(i) == ' ') continue;
+            if(arg.charAt(i) == '(' || arg.charAt(i) == ')') continue;
+            
+            if(isSign(arg.charAt(i))){
+                workedString+=" ";
+                workedString+=arg.charAt(i);
+                workedString+=" ";
+            } else 
+                workedString+=arg.charAt(i);
+        }
 
-        
+        String[] workedStringBrk = workedString.split(" ");
+
+        for (int i = 0; i < workedStringBrk.length; i++) {
+            if(isSign(workedStringBrk[i])) continue;
+            if(workedStringBrk[i].equalsIgnoreCase("null")) continue;
+
+            if(workedStringBrk[i].startsWith("'")&&workedStringBrk[i].endsWith("'")) continue;
+
+            try {
+                Double.parseDouble(workedStringBrk[i]);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
         return true;
     }
 
-    public static boolean isNumberOrOperator(){
-
-        return false;
+    public static boolean isNumber(char arg){
+        return arg >= '0' && arg <= '9';
     }
 
     // -----------------  FUNCTIONS  -----------------
@@ -483,7 +506,7 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función COUNT: No se especificó la columna");
 
         if(column.equals("*"))
-            return Integer.toString(table.size()); 
+            return Integer.toString(table.size() - 1); 
 
         int indexOfColumn = -1;
         for (int i = 0; i < headers.size(); i++) 
@@ -494,7 +517,7 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función COUNT: No se encontró la columna " + column);
         
         int count = 0;
-        for (int i = 0; i < table.size(); i++) 
+        for (int i = 1; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equalsIgnoreCase("null"))
                 count++;
 
@@ -526,7 +549,7 @@ public class Eval {
         
         double sum = 0;
         int count = 0;
-        for (int i = 0; i < table.size(); i++) 
+        for (int i = 1; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null")){
 
                 try {
@@ -568,13 +591,33 @@ public class Eval {
         if(indexOfColumn == -1)
             throw new IllegalArgumentException("Error en la función MIN: No se encontró la columna " + column);
         
-        String min = "null";
+        // we are going to use collections method to find the min value
+
+        ArrayList<String> values = new ArrayList<>();
+
         for (int i = 1; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null"))
-                if(min.equals("null") || table.get(i).split(",")[indexOfColumn].compareTo(min) < 0)
-                    min = table.get(i).split(",")[indexOfColumn];
-
-        return min;
+                values.add(table.get(i).split(",")[indexOfColumn]);
+        
+        if(values.size() == 0)
+            return "0";
+        
+        try {
+            double d = Double.parseDouble(values.get(0));
+            for (int i = 1; i < values.size(); i++) 
+                if(Double.parseDouble(values.get(i)) < d)
+                    d = Double.parseDouble(values.get(i));
+            return Double.toString(d);
+        } catch (NumberFormatException e) {
+            String min = "";
+            min = values.get(0);
+            for (int i = 1; i < values.size(); i++) 
+                if(values.get(i).compareTo(min) < 0)
+                    min = values.get(i);
+            return min;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error en la función MIN");
+        }
     } 
 
     public static String MAX(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
@@ -600,13 +643,30 @@ public class Eval {
         if(indexOfColumn == -1)
             throw new IllegalArgumentException("Error en la función MAX: No se encontró la columna " + column);
         
-        String max = "null";
+        ArrayList<String> values = new ArrayList<>();
         for (int i = 1; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null"))
-                if(max.equals("null") || table.get(i).split(",")[indexOfColumn].compareTo(max) > 0)
-                    max = table.get(i).split(",")[indexOfColumn];
+                values.add(table.get(i).split(",")[indexOfColumn]);
 
-        return max;
+        if(values.size() == 0)
+            return "0";
+
+        try {
+            double d = Double.parseDouble(values.get(0));
+            for (int i = 1; i < values.size(); i++) 
+                if(Double.parseDouble(values.get(i)) > d)
+                    d = Double.parseDouble(values.get(i));
+            return Double.toString(d);
+        } catch (NumberFormatException e) {
+            String max = "";
+            max = values.get(0);
+            for (int i = 1; i < values.size(); i++) 
+                if(values.get(i).compareTo(max) > 0)
+                    max = values.get(i);
+            return max;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error en la función MAX");
+        }
     }
 
     public static String SUM(String arg, ArrayList<Header> headers, String[] lineBreak, ArrayList<String> table){
@@ -633,7 +693,7 @@ public class Eval {
             throw new IllegalArgumentException("Error en la función SUM: No se encontró la columna " + column);
         
         double sum = 0;
-        for (int i = 0; i < table.size(); i++) 
+        for (int i = 1; i < table.size(); i++) 
             if(!table.get(i).split(",")[indexOfColumn].equals("null")){
 
                 try {

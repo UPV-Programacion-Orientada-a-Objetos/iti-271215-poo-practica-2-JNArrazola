@@ -114,7 +114,7 @@ public class Select {
         // * End of handling aliases
         ArrayList<String> resultTable = new ArrayList<>();
         ArrayList<String> table = Utilities.getTable(tableName);
-
+        resultTable.add(table.get(0));
         try{
             for (int i = 1; i < table.size(); i++) {
                 String[] lineBrk = table.get(i).split(",");
@@ -136,12 +136,11 @@ public class Select {
                 System.out.print(headers.get(i).getName() + " ");
             System.out.println();
 
-            for (int i = 0; i < resultTable.size(); i++)
+            for (int i = 1; i < resultTable.size(); i++)
                 System.out.println(resultTable.get(i));
-
+                
             return "Select realizado con éxito";
-        }
-
+        }   
         ArrayList<String> finaltable = new ArrayList<>();
 
         // * Here i print headers
@@ -158,7 +157,7 @@ public class Select {
 
         try {
             // ! First i iterate through the result table
-            for (int i = 0; i < resultTable.size(); i++) {
+            for (int i = 1; i < resultTable.size(); i++) {
                 String[] lineBrk = resultTable.get(i).split(",");
                 String line = "";
 
