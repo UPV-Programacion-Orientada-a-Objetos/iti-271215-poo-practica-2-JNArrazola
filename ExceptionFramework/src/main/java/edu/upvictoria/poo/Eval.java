@@ -301,7 +301,8 @@ public class Eval {
         for (int i = 0; i < arg.length(); i++) {
             if(arg.charAt(i) == ' ') continue;
             if(arg.charAt(i) == '(' || arg.charAt(i) == ')') continue;
-            
+            if(arg.charAt(i) == '.') continue;
+
             if(isSign(arg.charAt(i))){
                 workedString+=" ";
                 workedString+=arg.charAt(i);
@@ -318,11 +319,9 @@ public class Eval {
 
             if(workedStringBrk[i].startsWith("'")&&workedStringBrk[i].endsWith("'")) continue;
 
-            try {
-                Double.parseDouble(workedStringBrk[i]);
-            } catch (Exception e) {
-                return false;
-            }
+            for(int j = 0; j < workedStringBrk[i].length(); j++)
+                if(!isNumber(workedStringBrk[i].charAt(j)))
+                    throw new IllegalArgumentException("Error en la sentencia: " + workedStringBrk[i]);
         }
 
         return true;
