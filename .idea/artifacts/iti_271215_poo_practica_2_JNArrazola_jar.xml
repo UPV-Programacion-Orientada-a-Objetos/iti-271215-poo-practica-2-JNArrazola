@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="iti-271215-poo-practica-2-JNArrazola:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/iti_271215_poo_practica_2_JNArrazola_jar</output-path>
+    <root id="archive" name="iti-271215-poo-practica-2-JNArrazola.jar">
+      <element id="module-output" name="iti-271215-poo-practica-2-JNArrazola" />
+    </root>
+  </artifact>
+</component>
