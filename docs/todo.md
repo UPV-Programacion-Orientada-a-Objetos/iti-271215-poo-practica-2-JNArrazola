@@ -4,4 +4,4 @@
 - [X] Añadir validación si es una función no válida
 - [X] Cambiar el where en las funciones update y delete
 - [X] Crear test cases
-- [ ] Testear testear y más testear
+- [X] Testear testear y más testear

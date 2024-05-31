@@ -39,15 +39,14 @@ update test set name = ucase(name);
 ---------------- Delete --------------------------
 delete from test where id + 2 < 10;
 
-
 --------------- Crear tabla ----------------------
 create table employees(id int primary key, str varchar(20), age int, money double);
 
 --------------- Insert into ---------------------
 insert into employees (id,str,age,money) values (1,'pedro',12,200.12);
 insert into employees (id,str,age,money) values (2,'miguel',16,141.23);
-insert into employees (id,str,age,money) values (3,'jose',12,3541.34);
-insert into employees (id,str,age,money) values (4,'ignacio',12,2112.56);
+insert into employees (id,str,age,money) values (3,'jose',20,3541.34);
+insert into employees (id,str,age,money) values (4,'ignacio',35,2112.56);
 
 --------------- Select .........................
 select str, max(age) from employees where str = 'pedro' or (str = 'miguel' and money = 141.23);
